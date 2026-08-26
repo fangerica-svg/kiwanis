@@ -1,1 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>淡水國際同濟會 第28屆 會務追蹤</title>
+<style>
+:root{
+  --blue:#003974;--gold:#B8975B;--gold-d:#8C6F38;--gold-lt:#E7D4AC;
+  --cream:#FAF2E0;--cream-2:#F3E6C9;--card:#FFFDF7;--line:#E8D9B8;
+  --ink:#3B2E17;--ink-soft:#8A7855;
+}
+html{background:var(--cream);color-scheme:light}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;background:var(--cream);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:16px;line-height:1.5;padding-bottom:60px;
+}
+header{
+  background:linear-gradient(180deg,var(--cream-2),var(--cream));
+  position:sticky;top:0;z-index:20;padding:16px 16px 0;border-bottom:1px solid var(--gold-lt);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.seal{
+  width:44px;height:44px;border-radius:50%;flex:0 0 44px;border:2.5px solid var(--gold);
+  display:grid;place-items:center;font-weight:800;font-size:22px;color:var(--blue);background:#FFF8E8;
+}
+.brand h1{font-size:17px;margin:0;font-weight:700;color:var(--blue);letter-spacing:.5px}
+.brand p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#9BBF8F;margin-right:5px;vertical-align:1px}
+.dot.off{background:#D08B7A}
+.tabs{display:flex;margin-top:14px;gap:2px}
+.tab{
+  flex:1;text-align:center;padding:11px 4px 9px;border:0;cursor:pointer;background:transparent;
+  color:var(--ink-soft);font-size:14.5px;font-weight:600;font-family:inherit;border-bottom:3px solid transparent;
+}
+.tab.on{color:var(--blue);border-bottom-color:var(--gold)}
+.tab small{display:block;font-size:11px;font-weight:400;margin-top:2px;opacity:.85}
+
+.wrap{max-width:720px;margin:0 auto;padding:14px 12px}
+.bar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.bar .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.bar .big{font-size:22px;font-weight:800;color:var(--blue)}
+.bar .lab{font-size:12.5px;color:var(--ink-soft)}
+.track{height:8px;border-radius:99px;background:var(--cream-2);margin-top:10px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--gold-lt),var(--gold));width:0;transition:width .3s}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+input[type=text],input[type=number],input[type=password]{
+  font-family:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--line);
+  border-radius:10px;background:#fff;color:var(--ink);min-width:0;
+}
+input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.btn{
+  font-family:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card);color:var(--blue);cursor:pointer;
+}
+.btn.gold{background:var(--gold);border-color:var(--gold-d);color:#fff}
+.search{flex:1}
+.chips{display:flex;gap:6px;margin-bottom:12px}
+.chip{
+  flex:1;font-family:inherit;font-size:13.5px;font-weight:600;padding:9px 4px;border-radius:99px;
+  border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;
+}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.lockbox{
+  display:flex;gap:8px;align-items:center;margin-bottom:12px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+}
+.lockbox .txt{flex:1;font-size:13px;color:var(--ink-soft)}
+.lockbox input{width:100px}
+
+h2.grp{
+  font-size:13.5px;letter-spacing:2px;color:var(--gold-d);margin:18px 4px 8px;
+  display:flex;align-items:center;gap:8px;font-weight:700;
+}
+h2.grp::after{content:"";flex:1;height:1px;background:var(--gold-lt)}
+h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;letter-spacing:0}
+
+.item{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+  margin-bottom:8px;display:flex;align-items:center;gap:12px;
+}
+.item.done{border-color:var(--gold);background:#FBF1DC}
+.who{flex:1;min-width:0}
+.who .name{font-size:16.5px;font-weight:600;color:var(--blue)}
+.who .title{font-size:12px;color:var(--ink-soft);margin-top:1px}
+.chk{
+  width:34px;height:34px;flex:0 0 34px;border-radius:9px;border:2px solid var(--gold-lt);
+  background:#fff;cursor:pointer;display:grid;place-items:center;font-size:19px;color:transparent;font-weight:800;
+}
+.chk.on{background:var(--gold);border-color:var(--gold-d);color:#fff}
+.money{width:100px;flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.money::-webkit-outer-spin-button,.money::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.moneyRO{width:100px;flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;color:var(--ink-soft)}
+.empty{
+  background:var(--card);border:1px dashed var(--gold);border-radius:12px;padding:26px 16px;
+  text-align:center;color:var(--ink-soft);font-size:14.5px;
+}
+.foot{text-align:center;font-size:12px;color:var(--ink-soft);padding:24px 12px}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--blue);color:#fff;
+  padding:11px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media print{header{position:static}.tools,.chips,.lockbox,.btn,.toast{display:none}body{background:#fff;padding:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="seal">K</div>
+    <div>
+      <h1>淡水國際同濟會　第28屆</h1>
+      <p><span class="dot" id="dot"></span><span id="conn">連線中…</span></p>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-tab="fee">會費繳交<small id="tb1">—</small></button>
+    <button class="tab" data-tab="tie">領帶領取<small id="tb2">—</small></button>
+    <button class="tab" data-tab="award">會內敘獎<small id="tb3">—</small></button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="bar">
+    <div class="row"><span class="lab" id="statLab">—</span><span class="big" id="statBig">—</span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <div class="chips">
+    <button class="chip on" data-f="all">全部</button>
+    <button class="chip" data-f="todo" id="chipTodo">未完成</button>
+    <button class="chip" data-f="done" id="chipDone">已完成</button>
+  </div>
+
+  <div class="lockbox" id="lockbox" style="display:none">
+    <span class="txt" id="lockTxt">輸入密碼可管理金額</span>
+    <input type="password" id="pw" inputmode="numeric" placeholder="密碼">
+    <button class="btn gold" id="unlockBtn">解鎖</button>
+    <button class="btn" id="lockBtn" style="display:none">鎖定</button>
+  </div>
+
+  <div class="tools">
+    <input type="text" class="search" id="q" placeholder="搜尋姓名或職稱…">
+    <button class="btn" id="copyBtn">複製未完成</button>
+    <button class="btn" id="csvBtn">匯出 CSV</button>
+  </div>
+
+  <div class="tools" id="feeTools" style="display:none">
+    <input type="number" id="defAmt" value="3000" step="100" style="width:110px">
+    <button class="btn gold" id="applyAll">套用金額到全部</button>
+    <button class="btn" id="applyEmpty">只套用空白的</button>
+  </div>
+
+  <div id="list"><div class="empty">讀取名單中…</div></div>
+  <div class="foot">資料儲存於 Supabase，多人即時同步。<br>依 115/8/22 簽到表建立。</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL="https://hhnbymkhpthdnbhtxlsx.supabase.co";
+const SB_KEY="sb_publishable_kTQT2AaMHZf4tKNbfdVjEA_hQFuwaCi";
+const TABLE="kiwanis_members";
+const PW="8383";
+const db=supabase.createClient(SB_URL,SB_KEY);
+
+const SEED=[
+ ["幹部","會長","李益欽",1,1],["幹部","前任會長","潘文進",1,1],["幹部","候任會長","連政凱",1,1],
+ ["幹部","副會長","林永龍",1,1],["幹部","副會長","王治政",1,1],["幹部","理事","張鈞霖",1,1],
+ ["幹部","理事","陳國華",1,1],["幹部","理事","陳志成",0,0],["幹部","理事","黃自強",1,1],
+ ["幹部","常務監事","呂承男",1,1],["幹部","監事","杜凱恩",1,1],["幹部","監事","紀傑元",1,1],
+ ["幹部","法制顧問","陳福音",1,1],["幹部","秘書長","方思喻",1,1],["幹部","財務長","黃錦紹",1,1],
+ ["幹部","第26屆會長","曾健瑞",1,1],
+ ["歷屆會長","創會長","謝安棋",1,1],["歷屆會長","第4屆會長","盧忠義",1,1],["歷屆會長","第6屆會長","林勝弘",1,1],
+ ["歷屆會長","第7屆會長","盧金龍",1,1],["歷屆會長","第9屆會長","李建勝",1,1],["歷屆會長","第10屆會長","周清源",1,1],
+ ["歷屆會長","第12屆會長","林國峯",1,1],["歷屆會長","第13屆會長","陳銘志",1,1],["歷屆會長","第14屆會長","陳煌林",0,0],
+ ["歷屆會長","第15屆會長","謝仲信",1,1],["歷屆會長","第16屆會長","許春敏",1,1],["歷屆會長","第18屆會長","王燦煌",1,1],
+ ["歷屆會長","第19屆會長","魏培文",1,1],["歷屆會長","第21屆會長","許隆華",1,1],["歷屆會長","第22屆會長","郭丁木",1,1],
+ ["歷屆會長","第24屆會長","盧春林",1,1],["歷屆會長","第25屆會長","游閔勇",1,1],
+ ["會兄","會兄","盧進財",0,1],["會兄","會兄","吳德銘",1,1],["會兄","會兄","紀景元",1,1],
+ ["會兄","會兄","黃梓榮",1,1],["會兄","會兄","周文烈",0,0],["會兄","會兄","陳文肯",0,0],
+ ["會兄","會兄","盧武揚",0,0],["會兄","會兄","林峻賢",1,1],["會兄","會兄","陳昆伸",0,0],
+ ["會兄","會兄","曾鈺澤",0,0],["會兄","會兄","林正偉",0,0],["會兄","會兄","王嘉偉",1,1],
+ ["會兄","會兄","施嘉鎮",1,0],["會兄","會兄","吳培協",0,0],["會兄","會兄","楊聰賓",1,1],
+ ["會兄","會兄","黃呈達",0,0]
+];
+
+let M=[],tab="fee",filt="all",unlocked=false;
+const WORD={fee:{todo:"未繳",done:"已繳",list:"尚未繳交會費"},
+            tie:{todo:"未領",done:"已領",list:"尚未領取領帶"},
+            award:{todo:"未領",done:"已領",list:"尚未領取敘獎禮品"}};
+
+function conn(t,ok){document.getElementById("conn").textContent=t;
+  document.getElementById("dot").className="dot"+(ok?"":" off");}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),1600);}
+
+async function boot(){
+  try{
+    let {data,error}=await db.from(TABLE).select("*").order("sort_no");
+    if(error)throw error;
+    if(!data||!data.length){
+      conn("首次建立名單…",true);
+      const rows=SEED.map((r,i)=>({sort_no:i+1,grp:r[0],title:r[1],name:r[2],
+        fee_amount:0,fee_paid:false,tie_received:!!r[3],award_received:!!r[4]}));
+      const ins=await db.from(TABLE).insert(rows);
+      if(ins.error)throw ins.error;
+      const re=await db.from(TABLE).select("*").order("sort_no");
+      data=re.data;
+    }
+    M=data;
+    conn("已連線・即時同步",true);
+    db.channel("kiwanis").on("postgres_changes",
+      {event:"*",schema:"public",table:TABLE},payload=>{
+        const r=payload.new;if(!r)return;
+        const i=M.findIndex(x=>x.id===r.id);
+        if(i>=0)M[i]=r;else M.push(r);
+        M.sort((a,b)=>a.sort_no-b.sort_no);render();
+      }).subscribe();
+    render();
+  }catch(e){
+    conn("連線失敗，請檢查網路或後台設定",false);
+    document.getElementById("list").innerHTML=
+      '<div class="empty">讀不到資料：'+(e.message||e)+'</div>';
+  }
+}
+
+async function push(row,patch){
+  Object.assign(row,patch);render();
+  const {error}=await db.from(TABLE).update(
+    Object.assign({},patch,{updated_at:new Date().toISOString()})).eq("id",row.id);
+  if(error)toast("儲存失敗，請重試");
+}
+
+function done(m){
+  return tab==="fee"?m.fee_paid:(tab==="tie"?m.tie_received:m.award_received);
+}
+function toggle(m){
+  const k=tab==="fee"?"fee_paid":(tab==="tie"?"tie_received":"award_received");
+  push(m,{[k]:!m[k]});
+}
+
+const timers={};
+function setAmt(m,v){
+  m.fee_amount=v===""?0:+v;stats();
+  clearTimeout(timers[m.id]);
+  timers[m.id]=setTimeout(()=>push(m,{fee_amount:m.fee_amount}),500);
+}
+
+function render(){
+  const q=document.getElementById("q").value.trim();
+  const w=WORD[tab];
+  document.getElementById("chipTodo").textContent=w.todo;
+  document.getElementById("chipDone").textContent=w.done;
+  document.getElementById("copyBtn").textContent=filt==="done"?"複製已完成":"複製未完成";
+
+  const isFee=tab==="fee";
+  document.getElementById("lockbox").style.display=isFee?"flex":"none";
+  document.getElementById("feeTools").style.display=(isFee&&unlocked)?"flex":"none";
+  document.getElementById("lockTxt").textContent=unlocked?"金額管理已解鎖":"輸入密碼可管理金額";
+  document.getElementById("pw").style.display=unlocked?"none":"block";
+  document.getElementById("unlockBtn").style.display=unlocked?"none":"block";
+  document.getElementById("lockBtn").style.display=unlocked?"block":"none";
+
+  const list=document.getElementById("list");list.innerHTML="";
+  let shown=0;
+  ["幹部","歷屆會長","會兄"].forEach(g=>{
+    const all=M.filter(m=>m.grp===g);
+    const rows=all.filter(m=>(!q||(m.name||"").includes(q)||(m.title||"").includes(q))
+      &&(filt==="all"||(filt==="todo"?!done(m):done(m))));
+    if(!rows.length)return;
+    shown+=rows.length;
+    const h=document.createElement("h2");h.className="grp";
+    h.innerHTML=g+' <em>'+(filt==="all"?all.filter(done).length+' / '+all.length:rows.length+' 人')+'</em>';
+    list.appendChild(h);
+    rows.forEach(m=>{
+      const d=done(m);
+      const el=document.createElement("div");el.className="item"+(d?" done":"");
+      el.innerHTML='<div class="who"><div class="name">'+m.name+'</div><div class="title">'+m.title+'</div></div>';
+      if(isFee){
+        if(unlocked){
+          const inp=document.createElement("input");
+          inp.type="number";inp.className="money";inp.placeholder="金額";inp.step="100";
+          inp.value=m.fee_amount||"";
+          inp.oninput=()=>setAmt(m,inp.value);
+          el.appendChild(inp);
+        }else{
+          const sp=document.createElement("div");sp.className="moneyRO";
+          sp.textContent=m.fee_amount?"$"+(+m.fee_amount).toLocaleString():"";
+          el.appendChild(sp);
+        }
+      }
+      const b=document.createElement("button");
+      b.className="chk"+(d?" on":"");b.textContent="✓";
+      b.setAttribute("aria-label",m.name+(d?" 已完成":" 未完成"));
+      b.onclick=()=>toggle(m);
+      el.appendChild(b);
+      list.appendChild(el);
+    });
+  });
+  if(!shown){
+    const e=document.createElement("div");e.className="empty";
+    e.textContent=q?"找不到「"+q+"」":(filt==="todo"?"全部都完成了 🎉":"目前還沒有人完成");
+    list.appendChild(e);
+  }
+  stats();
+}
+
+function stats(){
+  const N=M.length||1;
+  const t1=M.filter(m=>m.fee_paid).length,t2=M.filter(m=>m.tie_received).length,t3=M.filter(m=>m.award_received).length;
+  document.getElementById("tb1").textContent=t1+"/"+M.length;
+  document.getElementById("tb2").textContent=t2+"/"+M.length;
+  document.getElementById("tb3").textContent=t3+"/"+M.length;
+  let n,lab;
+  if(tab==="fee"){
+    n=t1;
+    if(unlocked){
+      const due=M.reduce((s,m)=>s+(+m.fee_amount||0),0);
+      const got=M.reduce((s,m)=>s+(m.fee_paid?(+m.fee_amount||0):0),0);
+      lab="應收 $"+due.toLocaleString()+"　已收 $"+got.toLocaleString()+"　未收 $"+(due-got).toLocaleString();
+    }else lab="已繳會費人數";
+  }else if(tab==="tie"){n=t2;lab="已領取領帶";}
+  else{n=t3;lab="已領取敘獎禮品";}
+  document.getElementById("statLab").textContent=lab;
+  document.getElementById("statBig").textContent=n+" / "+M.length+" 人";
+  document.getElementById("fill").style.width=(n/N*100)+"%";
+}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");tab=b.dataset.tab;render();
+});
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");filt=b.dataset.f;render();
+});
+document.getElementById("q").oninput=render;
+function tryUnlock(){
+  const el=document.getElementById("pw");
+  if(el.value===PW){unlocked=true;el.value="";render();toast("已解鎖金額管理");}
+  else{el.value="";toast("密碼錯誤");}
+}
+document.getElementById("unlockBtn").onclick=tryUnlock;
+document.getElementById("pw").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
+document.getElementById("lockBtn").onclick=()=>{unlocked=false;render();toast("已鎖定");};
+document.getElementById("applyAll").onclick=async()=>{
+  const v=+document.getElementById("defAmt").value||0;
+  M.forEach(m=>m.fee_amount=v);render();
+  const {error}=await db.from(TABLE).update({fee_amount:v}).neq("id",0);
+  toast(error?"儲存失敗":"已套用 $"+v+" 到全部");
+};
+document.getElementById("applyEmpty").onclick=async()=>{
+  const v=+document.getElementById("defAmt").value||0;
+  const ids=M.filter(m=>!m.fee_amount).map(m=>m.id);
+  if(!ids.length){toast("沒有空白的欄位");return;}
+  M.forEach(m=>{if(ids.includes(m.id))m.fee_amount=v;});render();
+  const {error}=await db.from(TABLE).update({fee_amount:v}).in("id",ids);
+  toast(error?"儲存失敗":"空白欄位已填入 $"+v);
+};
+document.getElementById("copyBtn").onclick=()=>{
+  const w=WORD[tab],wantDone=filt==="done";
+  const rows=M.filter(m=>wantDone?done(m):!done(m)).map(m=>"・"+m.name+"（"+m.title+"）");
+  const head=wantDone?"【已完成："+w.list.replace("尚未","")+"】":"【"+w.list+"】";
+  navigator.clipboard.writeText(head+"共 "+rows.length+" 人\n"+rows.join("\n"))
+    .then(()=>toast("已複製 "+rows.length+" 人"),()=>toast("複製失敗，請長按選取"));
+};
+document.getElementById("csvBtn").onclick=()=>{
+  let c="\uFEFF職稱,姓名,"+(unlocked?"會費金額,":"")+"會費已繳,領帶已領,敘獎已領\n";
+  M.forEach(m=>{
+    const a=[m.title,m.name];
+    if(unlocked)a.push(m.fee_amount||0);
+    a.push(m.fee_paid?"V":"",m.tie_received?"V":"",m.award_received?"V":"");
+    c+=a.join(",")+"\n";});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));
+  a.download="同濟會第28屆_會務追蹤.csv";a.click();toast("已匯出 CSV");
+};
+boot();
+</script>
+</body>
+</html>
 
