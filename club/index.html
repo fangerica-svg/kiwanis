@@ -92,6 +92,8 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
   background:#fff;cursor:pointer;display:grid;place-items:center;font-size:19px;color:transparent;font-weight:800;
 }
 .chk.on{background:var(--gold);border-color:var(--gold-d);color:#fff}
+.chk.ro{cursor:default;border-style:dashed}
+.chk.ro.on{border-style:solid;opacity:.85}
 .money{width:100px;flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
 .money::-webkit-outer-spin-button,.money::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .moneyRO{width:100px;flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;color:var(--ink-soft)}
@@ -148,8 +150,8 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
     <button class="chip" data-f="done" id="chipDone">已完成</button>
   </div>
 
-  <div class="lockbox" id="lockbox" style="display:none">
-    <span class="txt" id="lockTxt">輸入密碼可查看金額</span>
+  <div class="lockbox" id="lockbox" style="display:flex">
+    <span class="txt" id="lockTxt">檢視模式・輸入密碼可編輯</span>
     <input type="password" id="pw" inputmode="numeric" placeholder="密碼" autocomplete="off">
     <button class="btn gold" id="unlockBtn">解鎖</button>
     <button class="btn" id="lockBtn" style="display:none">鎖定</button>
@@ -298,9 +300,9 @@ function render(){
   document.getElementById("copyBtn").textContent=filt==="done"?"複製已完成":"複製未完成";
 
   const isFee=tab==="fee";
-  document.getElementById("lockbox").style.display=isFee?"flex":"none";
+  document.getElementById("lockbox").style.display="flex";
   document.getElementById("feeTools").style.display=(isFee&&unlocked)?"flex":"none";
-  document.getElementById("lockTxt").textContent=unlocked?"金額管理已解鎖":"輸入密碼可查看金額";
+  document.getElementById("lockTxt").textContent=unlocked?"編輯模式・可打勾與改金額":"檢視模式・輸入密碼可編輯";
   document.getElementById("pw").style.display=unlocked?"none":"block";
   document.getElementById("unlockBtn").style.display=unlocked?"none":"block";
   document.getElementById("lockBtn").style.display=unlocked?"block":"none";
@@ -336,7 +338,8 @@ function render(){
       const b=document.createElement("button");
       b.className="chk"+(d?" on":"");b.textContent="✓";
       b.setAttribute("aria-label",m.name+(d?" 已完成":" 未完成"));
-      b.onclick=()=>toggle(m);
+      if(unlocked){b.onclick=()=>toggle(m);}
+      else{b.classList.add("ro");b.onclick=()=>toast("需輸入編輯密碼才能修改");}
       el.appendChild(b);
       list.appendChild(el);
     });
@@ -416,12 +419,12 @@ async function tryUnlock(){
   if(!el.value)return;
   try{
     await openVault(el.value,VB);
-    unlocked=true;el.value="";render();toast("已解鎖金額管理");
+    unlocked=true;el.value="";render();toast("已進入編輯模式");
   }catch(e){el.value="";toast("密碼錯誤");}
 }
 document.getElementById("unlockBtn").onclick=tryUnlock;
 document.getElementById("pw").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
-document.getElementById("lockBtn").onclick=()=>{unlocked=false;render();toast("已鎖定");};
+document.getElementById("lockBtn").onclick=()=>{unlocked=false;render();toast("已回到檢視模式");};
 
 async function signIn(){
   const el=document.getElementById("gpw"),err=document.getElementById("gerr"),btn=document.getElementById("goBtn");
