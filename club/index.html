@@ -105,6 +105,17 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
   padding:11px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.gate{
+  position:fixed;inset:0;z-index:200;background:linear-gradient(180deg,#F3E6C9,#FAF2E0);
+  display:grid;place-items:center;padding:24px;
+}
+.gate .box{width:100%;max-width:320px;text-align:center}
+.gate .seal{width:76px;height:76px;font-size:38px;margin:0 auto 18px;border-width:3px}
+.gate h2{font-size:21px;color:var(--blue);margin:0 0 4px;font-weight:700}
+.gate p{font-size:13px;color:var(--ink-soft);margin:0 0 22px}
+.gate input{width:100%;text-align:center;font-size:17px;padding:13px;letter-spacing:4px;margin-bottom:10px}
+.gate button{width:100%;padding:13px;font-size:16px}
+.gate .err{font-size:13px;color:#B4453A;height:18px;margin-top:8px}
 @media print{header{position:static}.tools,.chips,.lockbox,.btn,.toast{display:none}body{background:#fff;padding:0}}
 </style>
 </head>
@@ -138,8 +149,8 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
   </div>
 
   <div class="lockbox" id="lockbox" style="display:none">
-    <span class="txt" id="lockTxt">輸入密碼可管理金額</span>
-    <input type="password" id="pw" inputmode="numeric" placeholder="密碼">
+    <span class="txt" id="lockTxt">輸入密碼可查看金額</span>
+    <input type="password" id="pw" inputmode="numeric" placeholder="密碼" autocomplete="off">
     <button class="btn gold" id="unlockBtn">解鎖</button>
     <button class="btn" id="lockBtn" style="display:none">鎖定</button>
   </div>
@@ -160,15 +171,40 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
   <div class="foot">資料儲存於 Supabase，多人即時同步。<br>依 115/8/22 簽到表建立。</div>
 </div>
 
+<div class="gate" id="gate">
+  <div class="box">
+    <div class="seal">K</div>
+    <h2>淡水國際同濟會</h2>
+    <p>第28屆　會務追蹤</p>
+    <input type="password" id="gpw" inputmode="numeric" placeholder="輸入密碼" autocomplete="off">
+    <button class="btn gold" id="goBtn">開啟</button>
+    <div class="err" id="gerr"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SB_URL="https://hhnbymkhpthdnbhtxlsx.supabase.co";
-const SB_KEY="sb_publishable_kTQT2AaMHZf4tKNbfdVjEA_hQFuwaCi";
 const TABLE="kiwanis_members";
-const PW="8383";
-const db=supabase.createClient(SB_URL,SB_KEY);
+// 金鑰以密碼加密後存放，密碼不出現在原始碼中
+const VA={s:"NxMONceSWTBeHdZ2PQro8g==",i:"vJiOblCm2hWt/jrr",
+  c:"nDCPvqTUZUJEUt/K0SGuQfpaqqTz5IWimP2mglPSWp5E/B6o+wTjYPwvnZvW+jC12FUCoxwhrYqW1QNIOuE=",n:250000};
+const VB={s:"9mBywGc8A/0oJhc6PykMmA==",i:"kPs54i9/LJxFQGCc",
+  c:"ChrcgmtAwij32TDOm0S6GgplS/fXjuwcc4ef1RRkETM=",n:250000};
+let db=null;
+
+const b64=t=>Uint8Array.from(atob(t),ch=>ch.charCodeAt(0));
+async function openVault(pass,V){
+  const enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(pass),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey(
+    {name:"PBKDF2",salt:b64(V.s),iterations:V.n,hash:"SHA-256"},
+    base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const out=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(V.i)},key,b64(V.c));
+  return new TextDecoder().decode(out);
+}
 
 const SEED=[
  ["幹部","會長","李益欽",1,1],["幹部","前任會長","潘文進",1,1],["幹部","候任會長","連政凱",1,1],
@@ -191,7 +227,8 @@ const SEED=[
  ["會兄","會兄","黃呈達",0,0]
 ];
 
-let M=[],tab="fee",filt="all",unlocked=false;
+let M=[],tab="fee",filt="all";
+let unlocked=false;
 const WORD={fee:{todo:"未繳",done:"已繳",list:"尚未繳交會費"},
             tie:{todo:"未領",done:"已領",list:"尚未領取領帶"},
             award:{todo:"未領",done:"已領",list:"尚未領取敘獎禮品"}};
@@ -263,7 +300,7 @@ function render(){
   const isFee=tab==="fee";
   document.getElementById("lockbox").style.display=isFee?"flex":"none";
   document.getElementById("feeTools").style.display=(isFee&&unlocked)?"flex":"none";
-  document.getElementById("lockTxt").textContent=unlocked?"金額管理已解鎖":"輸入密碼可管理金額";
+  document.getElementById("lockTxt").textContent=unlocked?"金額管理已解鎖":"輸入密碼可查看金額";
   document.getElementById("pw").style.display=unlocked?"none":"block";
   document.getElementById("unlockBtn").style.display=unlocked?"none":"block";
   document.getElementById("lockBtn").style.display=unlocked?"block":"none";
@@ -342,14 +379,6 @@ document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
   b.classList.add("on");filt=b.dataset.f;render();
 });
 document.getElementById("q").oninput=render;
-function tryUnlock(){
-  const el=document.getElementById("pw");
-  if(el.value===PW){unlocked=true;el.value="";render();toast("已解鎖金額管理");}
-  else{el.value="";toast("密碼錯誤");}
-}
-document.getElementById("unlockBtn").onclick=tryUnlock;
-document.getElementById("pw").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
-document.getElementById("lockBtn").onclick=()=>{unlocked=false;render();toast("已鎖定");};
 document.getElementById("applyAll").onclick=async()=>{
   const v=+document.getElementById("defAmt").value||0;
   M.forEach(m=>m.fee_amount=v);render();
@@ -382,8 +411,35 @@ document.getElementById("csvBtn").onclick=()=>{
   a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));
   a.download="同濟會第28屆_會務追蹤.csv";a.click();toast("已匯出 CSV");
 };
-boot();
+async function tryUnlock(){
+  const el=document.getElementById("pw");
+  if(!el.value)return;
+  try{
+    await openVault(el.value,VB);
+    unlocked=true;el.value="";render();toast("已解鎖金額管理");
+  }catch(e){el.value="";toast("密碼錯誤");}
+}
+document.getElementById("unlockBtn").onclick=tryUnlock;
+document.getElementById("pw").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
+document.getElementById("lockBtn").onclick=()=>{unlocked=false;render();toast("已鎖定");};
+
+async function signIn(){
+  const el=document.getElementById("gpw"),err=document.getElementById("gerr"),btn=document.getElementById("goBtn");
+  if(!el.value){err.textContent="請輸入密碼";return;}
+  btn.disabled=true;btn.textContent="開啟中…";err.textContent="";
+  try{
+    const key=await openVault(el.value,VA);
+    db=supabase.createClient(SB_URL,key);
+    document.getElementById("gate").style.display="none";
+    boot();
+  }catch(e){
+    err.textContent="密碼錯誤";el.value="";
+  }
+  btn.disabled=false;btn.textContent="開啟";
+}
+document.getElementById("goBtn").onclick=signIn;
+document.getElementById("gpw").onkeydown=e=>{if(e.key==="Enter")signIn();};
+document.getElementById("gpw").focus();
 </script>
 </body>
 </html>
-
