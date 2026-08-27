@@ -118,6 +118,43 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
 .gate input{width:100%;text-align:center;font-size:17px;padding:13px;letter-spacing:4px;margin-bottom:10px}
 .gate button{width:100%;padding:13px;font-size:16px}
 .gate .err{font-size:13px;color:#B4453A;height:18px;margin-top:8px}
+
+/* ── 會費卡片 ── */
+.fcard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--gold-lt);
+  border-radius:12px;padding:11px 13px;margin-bottom:9px}
+.fcard.s-done{border-left-color:var(--gold);background:#FBF1DC}
+.fcard.s-part{border-left-color:#D9A441;background:#FDF6E6}
+.fcard.s-none{border-left-color:var(--gold-lt)}
+.fhead{display:flex;align-items:flex-start;gap:10px}
+.fhead .who{flex:1;min-width:0}
+.stamp{flex:0 0 auto;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;
+  border:1px solid var(--gold-lt);color:var(--ink-soft);background:#fff;white-space:nowrap}
+.stamp.done{background:var(--gold);border-color:var(--gold-d);color:#fff}
+.stamp.part{background:#F6E3B8;border-color:#D9A441;color:#7A5A15}
+.frows{margin-top:8px;border-top:1px dashed var(--gold-lt);padding-top:7px}
+.frow{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:2px 0;
+  font-variant-numeric:tabular-nums}
+.frow .fl{flex:0 0 76px;color:var(--ink-soft);font-size:12.5px}
+.frow .fd,.frow .fg{flex:1;text-align:right}
+.frow .fd{color:var(--ink-soft)}
+.frow .fg{font-weight:700;color:var(--blue)}
+.frow .fg.short{color:#B4453A}
+.frow .fg.zero{color:var(--ink-soft);font-weight:400}
+.frow .mk{flex:0 0 20px;text-align:center;font-weight:800;color:var(--gold-d)}
+.frow .mk.off{color:var(--gold-lt)}
+.fhint{display:flex;gap:8px;font-size:11px;color:var(--ink-soft);padding:0 0 3px}
+.fhint .fl{flex:0 0 76px}
+.fhint span:not(.fl){flex:1;text-align:right}
+.frow input.mi{width:100%;flex:1;text-align:right;font-size:14px;padding:5px 7px;
+  font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.frow input.mi::-webkit-outer-spin-button,.frow input.mi::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ffoot{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  margin-top:8px;border-top:1px dashed var(--gold-lt);padding-top:7px;font-size:12px}
+.ffoot .when{color:var(--gold-d);font-weight:600}
+.ffoot .when.no{color:var(--ink-soft);font-weight:400}
+.ffoot .sum{color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.ffoot .sum b{color:var(--blue);font-size:14px}
+.ffoot input.di{width:86px;text-align:center;font-size:13px;padding:5px 6px}
 @media print{header{position:static}.tools,.chips,.lockbox,.btn,.toast{display:none}body{background:#fff;padding:0}}
 </style>
 </head>
@@ -147,6 +184,7 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
   <div class="chips">
     <button class="chip on" data-f="all">全部</button>
     <button class="chip" data-f="todo" id="chipTodo">未完成</button>
+    <button class="chip" data-f="part" id="chipPart" style="display:none">部分繳</button>
     <button class="chip" data-f="done" id="chipDone">已完成</button>
   </div>
 
@@ -163,14 +201,8 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
     <button class="btn" id="csvBtn">匯出 CSV</button>
   </div>
 
-  <div class="tools" id="feeTools" style="display:none">
-    <input type="number" id="defAmt" value="3000" step="100" style="width:110px">
-    <button class="btn gold" id="applyAll">套用金額到全部</button>
-    <button class="btn" id="applyEmpty">只套用空白的</button>
-  </div>
-
   <div id="list"><div class="empty">讀取名單中…</div></div>
-  <div class="foot">資料儲存於 Supabase，多人即時同步。<br>依 115/8/22 簽到表建立。</div>
+  <div class="foot">資料儲存於 Supabase，多人即時同步。<br>會費依「28屆會費表 0827 版」建立。</div>
 </div>
 
 <div class="gate" id="gate">
@@ -226,12 +258,28 @@ const SEED=[
  ["會兄","會兄","盧武揚",0,0],["會兄","會兄","林峻賢",1,1],["會兄","會兄","陳昆伸",0,0],
  ["會兄","會兄","曾鈺澤",0,0],["會兄","會兄","林正偉",0,0],["會兄","會兄","王嘉偉",1,1],
  ["會兄","會兄","施嘉鎮",1,0],["會兄","會兄","吳培協",0,0],["會兄","會兄","楊聰賓",1,1],
- ["會兄","會兄","黃呈達",0,0]
+ ["會兄","會兄","黃呈達",0,0],["會兄","新會員","林政德",0,0]
 ];
+
+
+/* ── 會費：多項目收款 ── */
+const FITEM=[["fee","常年會費"],["fund","基金"],["duty","職務捐款"],["newm","新會員費"]];
+const nz=v=>+v||0;
+function fdue(m){return FITEM.reduce((s,it)=>s+nz(m[it[0]+"_due"]),0);}
+function fgot(m){return FITEM.reduce((s,it)=>s+nz(m[it[0]+"_got"]),0);}
+function fstate(m){const d=fdue(m),g=fgot(m);
+  if(d>0&&g>=d)return "done";
+  if(g>0)return "part";
+  return "none";}
+const nfmt=n=>nz(n).toLocaleString("en-US");
+function dfmt(v){v=(v||"").toString().trim();
+  if(!/^\d{3,4}$/.test(v))return "";
+  v=v.padStart(4,"0");
+  return (+v.slice(0,2))+"/"+v.slice(2);}
 
 let M=[],tab="fee",filt="all";
 let unlocked=false;
-const WORD={fee:{todo:"未繳",done:"已繳",list:"尚未繳交會費"},
+const WORD={fee:{todo:"未繳",part:"部分繳",done:"已繳清",list:"尚未繳交會費"},
             tie:{todo:"未領",done:"已領",list:"尚未領取領帶"},
             award:{todo:"未領",done:"已領",list:"尚未領取敘獎禮品"}};
 
@@ -278,7 +326,13 @@ async function push(row,patch){
 }
 
 function done(m){
-  return tab==="fee"?m.fee_paid:(tab==="tie"?m.tie_received:m.award_received);
+  return tab==="fee"?(fstate(m)==="done"):(tab==="tie"?m.tie_received:m.award_received);
+}
+function matchFilt(m){
+  if(filt==="all")return true;
+  if(tab!=="fee")return filt==="done"?done(m):!done(m);
+  const st=fstate(m);
+  return filt==="done"?st==="done":(filt==="part"?st==="part":st==="none");
 }
 function toggle(m){
   const k=tab==="fee"?"fee_paid":(tab==="tie"?"tie_received":"award_received");
@@ -286,22 +340,100 @@ function toggle(m){
 }
 
 const timers={};
-function setAmt(m,v){
-  m.fee_amount=v===""?0:+v;stats();
-  clearTimeout(timers[m.id]);
-  timers[m.id]=setTimeout(()=>push(m,{fee_amount:m.fee_amount}),500);
+function setF(m,field,v){
+  m[field]=v===""?0:+v;
+  const patch={};patch[field]=m[field];
+  patch.fee_amount=fdue(m);
+  patch.fee_paid=fstate(m)==="done";
+  m.fee_amount=patch.fee_amount;m.fee_paid=patch.fee_paid;
+  stats();
+  clearTimeout(timers[m.id+field]);
+  timers[m.id+field]=setTimeout(()=>push(m,patch),600);
+}
+function setDate(m,v){
+  v=(v||"").replace(/\D/g,"").slice(0,4);
+  m.pay_date=v||null;
+  clearTimeout(timers[m.id+"d"]);
+  timers[m.id+"d"]=setTimeout(()=>push(m,{pay_date:m.pay_date}),600);
+}
+function feeCard(m){
+  const st=fstate(m),due=fdue(m),got=fgot(m);
+  const el=document.createElement("div");
+  el.className="fcard s-"+st;
+  const lab=st==="done"?"已繳清":(st==="part"?"部分繳":"未繳");
+  const head=document.createElement("div");head.className="fhead";
+  head.innerHTML='<div class="who"><div class="name">'+m.name+'</div>'+
+    '<div class="title">'+(m.title||"")+'</div></div>'+
+    '<span class="stamp '+(st==="none"?"":st)+'">'+lab+'</span>';
+  el.appendChild(head);
+
+  const rows=document.createElement("div");rows.className="frows";
+  if(unlocked){
+    const hint=document.createElement("div");hint.className="fhint";
+    hint.innerHTML='<span class="fl"></span><span>應繳</span><span>已繳</span>';
+    rows.appendChild(hint);
+  }
+  FITEM.forEach(([k,name])=>{
+    const d=nz(m[k+"_due"]),g=nz(m[k+"_got"]);
+    if(!unlocked&&!d&&!g)return;
+    const row=document.createElement("div");row.className="frow";
+    const l=document.createElement("span");l.className="fl";l.textContent=name;row.appendChild(l);
+    if(unlocked){
+      [[k+"_due",d],[k+"_got",g]].forEach(([f,v])=>{
+        const inp=document.createElement("input");
+        inp.type="number";inp.className="mi";inp.step="100";inp.placeholder="0";
+        inp.value=v||"";inp.oninput=()=>setF(m,f,inp.value);
+        row.appendChild(inp);
+      });
+    }else{
+      const a=document.createElement("span");a.className="fd";a.textContent=nfmt(d);
+      const b=document.createElement("span");
+      b.className="fg"+(g>=d&&d>0?"":(g>0?" short":" zero"));
+      b.textContent=g?nfmt(g):"—";
+      const c=document.createElement("span");
+      c.className="mk"+(d>0&&g>=d?"":" off");c.textContent=d>0&&g>=d?"✓":"○";
+      row.appendChild(a);row.appendChild(b);row.appendChild(c);
+    }
+    rows.appendChild(row);
+  });
+  el.appendChild(rows);
+
+  const foot=document.createElement("div");foot.className="ffoot";
+  if(unlocked){
+    const wrap=document.createElement("span");
+    wrap.innerHTML='<span class="when no">入帳日期</span> ';
+    const di=document.createElement("input");
+    di.type="text";di.className="di";di.inputMode="numeric";di.maxLength=4;
+    di.placeholder="0811";di.value=m.pay_date||"";
+    di.oninput=()=>setDate(m,di.value);
+    wrap.appendChild(di);foot.appendChild(wrap);
+  }else{
+    const w=document.createElement("span");
+    const t=dfmt(m.pay_date);
+    w.className="when"+(t?"":" no");
+    w.textContent=t?t+" 入帳":"尚未入帳";
+    foot.appendChild(w);
+  }
+  const sum=document.createElement("span");sum.className="sum";
+  sum.innerHTML='已繳 <b>$'+nfmt(got)+'</b> ／ 應繳 $'+nfmt(due);
+  foot.appendChild(sum);
+  el.appendChild(foot);
+  return el;
 }
 
 function render(){
   const q=document.getElementById("q").value.trim();
   const w=WORD[tab];
+  const isFeeTab=tab==="fee";
   document.getElementById("chipTodo").textContent=w.todo;
   document.getElementById("chipDone").textContent=w.done;
+  document.getElementById("chipPart").style.display=isFeeTab?"block":"none";
+  if(!isFeeTab&&filt==="part"){filt="all";
+    document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x.dataset.f==="all"));}
   document.getElementById("copyBtn").textContent=filt==="done"?"複製已完成":"複製未完成";
 
   const isFee=tab==="fee";
   document.getElementById("lockbox").style.display="flex";
-  document.getElementById("feeTools").style.display=(isFee&&unlocked)?"flex":"none";
   document.getElementById("lockTxt").textContent=unlocked?"編輯模式・可打勾與改金額":"檢視模式・輸入密碼可編輯";
   document.getElementById("pw").style.display=unlocked?"none":"block";
   document.getElementById("unlockBtn").style.display=unlocked?"none":"block";
@@ -312,29 +444,17 @@ function render(){
   ["幹部","歷屆會長","會兄"].forEach(g=>{
     const all=M.filter(m=>m.grp===g);
     const rows=all.filter(m=>(!q||(m.name||"").includes(q)||(m.title||"").includes(q))
-      &&(filt==="all"||(filt==="todo"?!done(m):done(m))));
+      &&matchFilt(m));
     if(!rows.length)return;
     shown+=rows.length;
     const h=document.createElement("h2");h.className="grp";
     h.innerHTML=g+' <em>'+(filt==="all"?all.filter(done).length+' / '+all.length:rows.length+' 人')+'</em>';
     list.appendChild(h);
     rows.forEach(m=>{
+      if(isFee){list.appendChild(feeCard(m));return;}
       const d=done(m);
       const el=document.createElement("div");el.className="item"+(d?" done":"");
       el.innerHTML='<div class="who"><div class="name">'+m.name+'</div><div class="title">'+m.title+'</div></div>';
-      if(isFee){
-        if(unlocked){
-          const inp=document.createElement("input");
-          inp.type="number";inp.className="money";inp.placeholder="金額";inp.step="100";
-          inp.value=m.fee_amount||"";
-          inp.oninput=()=>setAmt(m,inp.value);
-          el.appendChild(inp);
-        }else{
-          const sp=document.createElement("div");sp.className="moneyRO";
-          sp.textContent=m.fee_amount?"$"+(+m.fee_amount).toLocaleString():"";
-          el.appendChild(sp);
-        }
-      }
       const b=document.createElement("button");
       b.className="chk"+(d?" on":"");b.textContent="✓";
       b.setAttribute("aria-label",m.name+(d?" 已完成":" 未完成"));
@@ -346,7 +466,8 @@ function render(){
   });
   if(!shown){
     const e=document.createElement("div");e.className="empty";
-    e.textContent=q?"找不到「"+q+"」":(filt==="todo"?"全部都完成了 🎉":"目前還沒有人完成");
+    e.textContent=q?"找不到「"+q+"」":
+      (filt==="todo"?"全部都完成了 🎉":(filt==="part"?"沒有部分繳款的會兄":"目前還沒有人完成"));
     list.appendChild(e);
   }
   stats();
@@ -354,7 +475,7 @@ function render(){
 
 function stats(){
   const N=M.length||1;
-  const t1=M.filter(m=>m.fee_paid).length,t2=M.filter(m=>m.tie_received).length,t3=M.filter(m=>m.award_received).length;
+  const t1=M.filter(m=>fstate(m)==="done").length,t2=M.filter(m=>m.tie_received).length,t3=M.filter(m=>m.award_received).length;
   document.getElementById("tb1").textContent=t1+"/"+M.length;
   document.getElementById("tb2").textContent=t2+"/"+M.length;
   document.getElementById("tb3").textContent=t3+"/"+M.length;
@@ -362,10 +483,12 @@ function stats(){
   if(tab==="fee"){
     n=t1;
     if(unlocked){
-      const due=M.reduce((s,m)=>s+(+m.fee_amount||0),0);
-      const got=M.reduce((s,m)=>s+(m.fee_paid?(+m.fee_amount||0):0),0);
-      lab="應收 $"+due.toLocaleString()+"　已收 $"+got.toLocaleString()+"　未收 $"+(due-got).toLocaleString();
-    }else lab="已繳會費人數";
+      const due=M.reduce((s,m)=>s+fdue(m),0),got=M.reduce((s,m)=>s+fgot(m),0);
+      lab="應收 $"+nfmt(due)+"　已收 $"+nfmt(got)+"　未收 $"+nfmt(due-got);
+    }else{
+      const part=M.filter(m=>fstate(m)==="part").length;
+      lab="已繳清人數"+(part?"（另有 "+part+" 位部分繳）":"");
+    }
   }else if(tab==="tie"){n=t2;lab="已領取領帶";}
   else{n=t3;lab="已領取敘獎禮品";}
   document.getElementById("statLab").textContent=lab;
@@ -382,33 +505,40 @@ document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
   b.classList.add("on");filt=b.dataset.f;render();
 });
 document.getElementById("q").oninput=render;
-document.getElementById("applyAll").onclick=async()=>{
-  const v=+document.getElementById("defAmt").value||0;
-  M.forEach(m=>m.fee_amount=v);render();
-  const {error}=await db.from(TABLE).update({fee_amount:v}).neq("id",0);
-  toast(error?"儲存失敗":"已套用 $"+v+" 到全部");
-};
-document.getElementById("applyEmpty").onclick=async()=>{
-  const v=+document.getElementById("defAmt").value||0;
-  const ids=M.filter(m=>!m.fee_amount).map(m=>m.id);
-  if(!ids.length){toast("沒有空白的欄位");return;}
-  M.forEach(m=>{if(ids.includes(m.id))m.fee_amount=v;});render();
-  const {error}=await db.from(TABLE).update({fee_amount:v}).in("id",ids);
-  toast(error?"儲存失敗":"空白欄位已填入 $"+v);
-};
 document.getElementById("copyBtn").onclick=()=>{
   const w=WORD[tab],wantDone=filt==="done";
-  const rows=M.filter(m=>wantDone?done(m):!done(m)).map(m=>"・"+m.name+"（"+m.title+"）");
-  const head=wantDone?"【已完成："+w.list.replace("尚未","")+"】":"【"+w.list+"】";
+  let sel,head;
+  if(tab==="fee"&&filt==="part"){
+    sel=M.filter(m=>fstate(m)==="part");head="【會費部分繳交】";
+  }else if(tab==="fee"&&!wantDone){
+    sel=M.filter(m=>fstate(m)==="none");head="【"+w.list+"】";
+  }else{
+    sel=M.filter(m=>wantDone?done(m):!done(m));
+    head=wantDone?"【已完成："+w.list.replace("尚未","")+"】":"【"+w.list+"】";
+  }
+  const rows=sel.map(m=>{
+    if(tab!=="fee")return "・"+m.name+"（"+m.title+"）";
+    const d=fdue(m),g=fgot(m);
+    if(!unlocked)return "・"+m.name+"（"+m.title+"）";
+    return "・"+m.name+"（"+m.title+"）"+(fstate(m)==="part"
+      ?" 已繳 $"+nfmt(g)+"／應繳 $"+nfmt(d)+"，尚差 $"+nfmt(d-g)
+      :" 應繳 $"+nfmt(d));
+  });
   navigator.clipboard.writeText(head+"共 "+rows.length+" 人\n"+rows.join("\n"))
     .then(()=>toast("已複製 "+rows.length+" 人"),()=>toast("複製失敗，請長按選取"));
 };
 document.getElementById("csvBtn").onclick=()=>{
-  let c="\uFEFF職稱,姓名,"+(unlocked?"會費金額,":"")+"會費已繳,領帶已領,敘獎已領\n";
+  const st={done:"已繳清",part:"部分繳",none:"未繳"};
+  let c="\uFEFF職稱,姓名,繳費狀態,入帳日期";
+  if(unlocked)c+=",常年會費應繳,常年會費已繳,基金應繳,基金已繳,職務捐款應繳,職務捐款已繳,新會員費應繳,新會員費已繳,合計應繳,合計已繳";
+  c+=",領帶已領,敘獎已領\n";
   M.forEach(m=>{
-    const a=[m.title,m.name];
-    if(unlocked)a.push(m.fee_amount||0);
-    a.push(m.fee_paid?"V":"",m.tie_received?"V":"",m.award_received?"V":"");
+    const a=[m.title,m.name,st[fstate(m)],dfmt(m.pay_date)];
+    if(unlocked){
+      FITEM.forEach(([k])=>{a.push(nz(m[k+"_due"]),nz(m[k+"_got"]));});
+      a.push(fdue(m),fgot(m));
+    }
+    a.push(m.tie_received?"V":"",m.award_received?"V":"");
     c+=a.join(",")+"\n";});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));
