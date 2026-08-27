@@ -154,7 +154,7 @@ h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;lette
 .ffoot .when.no{color:var(--ink-soft);font-weight:400}
 .ffoot .sum{color:var(--ink-soft);font-variant-numeric:tabular-nums}
 .ffoot .sum b{color:var(--blue);font-size:14px}
-.ffoot input.di{width:86px;text-align:center;font-size:13px;padding:5px 6px}
+.ffoot input.di{width:92px;text-align:center;font-size:13px;padding:5px 6px}
 @media print{header{position:static}.tools,.chips,.lockbox,.btn,.toast{display:none}body{background:#fff;padding:0}}
 </style>
 </head>
@@ -381,7 +381,7 @@ function feeCard(m){
     if(unlocked){
       [[k+"_due",d],[k+"_got",g]].forEach(([f,v])=>{
         const inp=document.createElement("input");
-        inp.type="number";inp.className="mi";inp.step="100";inp.placeholder="0";
+        inp.type="number";inp.className="mi";inp.step="100";inp.placeholder="";
         inp.value=v||"";inp.oninput=()=>setF(m,f,inp.value);
         row.appendChild(inp);
       });
@@ -404,7 +404,7 @@ function feeCard(m){
     wrap.innerHTML='<span class="when no">入帳日期</span> ';
     const di=document.createElement("input");
     di.type="text";di.className="di";di.inputMode="numeric";di.maxLength=4;
-    di.placeholder="0811";di.value=m.pay_date||"";
+    di.placeholder="未填";di.value=m.pay_date||"";
     di.oninput=()=>setDate(m,di.value);
     wrap.appendChild(di);foot.appendChild(wrap);
   }else{
@@ -440,6 +440,11 @@ function render(){
   document.getElementById("lockBtn").style.display=unlocked?"block":"none";
 
   const list=document.getElementById("list");list.innerHTML="";
+  if(isFee&&M.length&&M.every(m=>fdue(m)===0&&fgot(m)===0)){
+    const w=document.createElement("div");w.className="empty";
+    w.innerHTML="會費金額尚未匯入<br><small>請先到 Supabase 執行「會費欄位更新.sql」</small>";
+    list.appendChild(w);
+  }
   let shown=0;
   ["幹部","歷屆會長","會兄"].forEach(g=>{
     const all=M.filter(m=>m.grp===g);
