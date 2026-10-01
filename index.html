@@ -1,547 +1,555 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>代墊記帳本</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>淡水國際同濟會 第28屆</title>
 <style>
 :root{
-  --mint:#67D5B5;
-  --deep:#26705F;
-  --deeper:#17453A;
-  --coral:#EE7785;
-  --coral-soft:#FDECEE;
-  --taro:#C89EC4;
-  --sky:#84B1ED;
-  --paper:#FFFDF8;
-  --wash:#EAF6F1;
-  --line:#CFE6DD;
-  --ink:#274740;
-  --ink-soft:#5C7C74;
+  --blue:#003974;--gold:#B8975B;--gold-d:#8C6F38;--gold-lt:#E7D4AC;
+  --cream:#FAF2E0;--cream-2:#F3E6C9;--card:#FFFDF7;--line:#E8D9B8;
+  --ink:#3B2E17;--ink-soft:#8A7855;
 }
+html{background:var(--cream);color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
-body{
-  font-family:"Noto Sans TC",system-ui,-apple-system,sans-serif;
-  background:var(--wash);
-  color:var(--ink);
-  line-height:1.6;
-  padding-bottom:96px;
-}
-.mono{font-family:"Roboto Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input,select,textarea{font-family:inherit;font-size:16px}
-.wrap{max-width:640px;margin:0 auto;padding:0 16px}
-
-/* ---------- 密碼閘 ---------- */
-#gate{
-  position:fixed;inset:0;z-index:100;
-  background:linear-gradient(170deg,var(--deep),var(--deeper));
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px;
-}
-#gate .box{width:100%;max-width:320px;text-align:center;color:#fff}
-#gate h1{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:.08em}
-#gate p{margin:0 0 28px;color:var(--mint);font-size:14px;letter-spacing:.05em}
-#gate .clip{
-  width:64px;height:64px;margin:0 auto 20px;border-radius:50%;
-  background:var(--mint);display:flex;align-items:center;justify-content:center;
-  font-size:30px;
-}
-#pass{
-  width:100%;padding:14px;border-radius:12px;border:2px solid rgba(255,255,255,.25);
-  background:rgba(255,255,255,.1);color:#fff;text-align:center;
-  font-size:22px;letter-spacing:.6em;font-family:"Roboto Mono",monospace;
-}
-#pass::placeholder{color:rgba(255,255,255,.4);letter-spacing:.2em;font-size:15px}
-#gate button{
-  margin-top:14px;width:100%;padding:14px;border-radius:12px;
-  background:var(--mint);color:var(--deeper);font-weight:700;font-size:16px;
-}
-#gateErr{min-height:22px;margin-top:12px;color:var(--coral);font-size:14px}
-
-/* ---------- 頂部統計 ---------- */
-header{
-  background:linear-gradient(165deg,var(--deep),var(--deeper));
-  color:#fff;padding:22px 0 26px;border-radius:0 0 26px 26px;
-}
-.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.brand h1{font-size:17px;font-weight:500;margin:0;letter-spacing:.14em;color:var(--mint)}
-.brand button{font-size:13px;color:rgba(255,255,255,.65);padding:4px 8px}
-.big-label{font-size:13px;color:var(--mint);letter-spacing:.12em;margin-bottom:2px}
-.big-amt{font-size:38px;font-weight:700;line-height:1.15}
-.big-amt small{font-size:18px;font-weight:400;margin-right:4px;opacity:.7}
-.sub-row{display:flex;gap:26px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.18)}
-.sub-row div{flex:1}
-.sub-label{font-size:12px;color:rgba(255,255,255,.6);letter-spacing:.08em}
-.sub-val{font-size:19px;font-weight:500}
-
-/* ---------- 篩選 ---------- */
-.tools{display:flex;gap:8px;margin:16px 0 4px}
-.tools input,.tools select{
-  padding:10px 12px;border-radius:11px;border:1.5px solid var(--line);
-  background:var(--paper);color:var(--ink);
-}
-#q{flex:1;min-width:0}
-#month{flex:0 0 auto}
-.chips{display:flex;gap:8px;margin:10px 0 18px;flex-wrap:wrap}
-.chip{
-  padding:6px 13px;border-radius:999px;font-size:13px;
-  border:1.5px solid var(--line);background:var(--paper);color:var(--ink-soft);
-}
-.chip[aria-pressed="true"]{background:var(--deep);border-color:var(--deep);color:#fff}
-
-/* ---------- 票根卡 ---------- */
-.stub{
-  position:relative;background:var(--paper);border-radius:14px;
-  margin-bottom:12px;padding:14px 16px 14px 20px;
-  box-shadow:0 1px 0 var(--line),0 6px 14px rgba(38,112,95,.07);
-  border-left:6px solid var(--coral);overflow:hidden;
-}
-.stub.paid{border-left-color:var(--mint)}
-.stub::after{
-  content:"";position:absolute;left:6px;top:0;bottom:0;width:9px;
-  background-image:radial-gradient(circle at 0 5px,var(--wash) 4px,transparent 4.5px);
-  background-size:9px 14px;
-}
-.stub-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.stub-date{font-size:12.5px;color:var(--ink-soft);letter-spacing:.05em}
-.stub-item{font-size:16.5px;font-weight:500;margin-top:1px;word-break:break-all}
-.stub-note{font-size:13px;color:var(--ink-soft);margin-top:2px;word-break:break-all}
-.stub-amt{font-size:20px;font-weight:700;white-space:nowrap}
-.stub-bot{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
-.tag{
-  display:inline-flex;align-items:center;gap:5px;font-size:13px;
-  padding:6px 11px;border-radius:9px;border:1.5px solid var(--line);color:var(--ink-soft);
-}
-.tag.recp{border-color:var(--taro);color:#8E5F8A;background:#F8F1F7}
-.tag.pay{border-color:var(--coral);color:#C2455A;background:var(--coral-soft)}
-.tag.pay.on{border-color:var(--mint);color:var(--deep);background:#E6F7F1}
-.tag.edit{margin-left:auto;border-style:dashed}
-.stamp{
-  position:absolute;right:14px;bottom:8px;transform:rotate(-13deg);
-  border:2.5px solid var(--mint);color:var(--mint);border-radius:50%;
-  width:66px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;letter-spacing:.06em;opacity:.5;pointer-events:none;
-}
-.stamp span{font-size:9px;font-weight:400;letter-spacing:0}
-
-.mgroup{margin:22px 0 8px;display:flex;align-items:baseline;gap:10px}
-.mgroup h2{font-size:14px;margin:0;letter-spacing:.1em;color:var(--deep)}
-.mgroup em{font-style:normal;font-size:13px;color:var(--ink-soft)}
-.mgroup hr{flex:1;border:none;border-top:1.5px dashed var(--line)}
-
-.empty{text-align:center;padding:56px 20px;color:var(--ink-soft)}
-.empty div:first-child{font-size:40px;margin-bottom:10px}
-
-/* ---------- 新增鈕 ---------- */
-#fab{
-  position:fixed;right:max(18px,calc(50vw - 302px));bottom:24px;z-index:40;
-  background:var(--coral);color:#fff;font-size:16px;font-weight:700;
-  padding:15px 24px;border-radius:999px;box-shadow:0 8px 22px rgba(238,119,133,.45);
-}
-
-/* ---------- 表單 ---------- */
-#sheet{position:fixed;inset:0;z-index:60;display:none}
-#sheet.on{display:block}
-#sheet .bg{position:absolute;inset:0;background:rgba(23,69,58,.45)}
-#sheet .card{
-  position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;
-  background:var(--paper);border-radius:22px 22px 0 0;padding:20px 18px 30px;
-  max-width:640px;margin:0 auto;animation:up .22s ease;
-}
-@keyframes up{from{transform:translateY(24px);opacity:.6}}
-@media (prefers-reduced-motion:reduce){#sheet .card{animation:none}}
-.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.sheet-head h2{font-size:18px;margin:0;letter-spacing:.06em}
-.sheet-head button{font-size:15px;color:var(--ink-soft);padding:4px 8px}
-label{display:block;font-size:13px;color:var(--ink-soft);margin:14px 0 5px;letter-spacing:.06em}
-.fld{
-  width:100%;padding:13px 14px;border-radius:12px;
-  border:1.5px solid var(--line);background:#fff;color:var(--ink);
-}
-.fld:focus,.chip:focus-visible,button:focus-visible{outline:2.5px solid var(--sky);outline-offset:2px}
-#f_amount{font-family:"Roboto Mono",monospace;font-size:20px;font-weight:700}
-.rowck{display:flex;align-items:center;gap:10px;margin-top:18px;padding:13px 14px;border-radius:12px;background:var(--wash)}
-.rowck input{width:22px;height:22px;accent-color:var(--deep)}
-.rowck label{margin:0;font-size:15px;color:var(--ink)}
-#drop{
-  border:2px dashed var(--taro);border-radius:12px;padding:16px;text-align:center;
-  color:#8E5F8A;background:#FBF6FA;font-size:14px;
-}
-#prev{margin-top:10px;display:none}
-#prev img{width:100%;border-radius:12px;border:1.5px solid var(--line)}
-#prev button{font-size:13px;color:var(--coral);margin-top:6px}
-.acts{display:flex;gap:10px;margin-top:24px}
-.btn-main{flex:1;padding:15px;border-radius:13px;background:var(--deep);color:#fff;font-weight:700;font-size:16px}
-.btn-del{padding:15px 18px;border-radius:13px;background:var(--coral-soft);color:#C2455A;font-weight:500}
-.btn-main:disabled{opacity:.55}
-
-#viewer{position:fixed;inset:0;z-index:80;background:rgba(23,69,58,.9);display:none;align-items:center;justify-content:center;padding:16px}
-#viewer.on{display:flex}
-#viewer img{max-width:100%;max-height:86vh;border-radius:12px}
-#viewer button{position:absolute;top:16px;right:18px;color:#fff;font-size:26px;padding:6px 12px}
-
-#toast{
-  position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:90;
-  background:var(--deeper);color:#fff;padding:11px 20px;border-radius:999px;
-  font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;
-}
-#toast.on{opacity:1}
+body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:16px;line-height:1.5;padding-bottom:60px}
+header{background:linear-gradient(180deg,var(--cream-2),var(--cream));position:sticky;top:0;z-index:20;
+  padding:14px 16px 0;border-bottom:1px solid var(--gold-lt)}
+.brand{display:flex;align-items:center;gap:12px}
+.seal{width:42px;height:42px;border-radius:50%;flex:0 0 42px;border:2.5px solid var(--gold);
+  display:grid;place-items:center;font-weight:800;font-size:21px;color:var(--blue);background:#FFF8E8}
+.brand h1{font-size:16.5px;margin:0;font-weight:700;color:var(--blue)}
+.brand p{margin:2px 0 0;font-size:12px;color:var(--ink-soft)}
+.back{background:none;border:0;font-family:inherit;font-size:13px;color:var(--ink-soft);
+  padding:0 0 10px;cursor:pointer;display:none}
+.tabs{display:flex;margin-top:12px;gap:2px}
+.tab{flex:1;text-align:center;padding:11px 4px 9px;border:0;cursor:pointer;background:transparent;
+  color:var(--ink-soft);font-size:14.5px;font-weight:600;font-family:inherit;border-bottom:3px solid transparent}
+.tab.on{color:var(--blue);border-bottom-color:var(--gold)}
+.tab small{display:block;font-size:11px;font-weight:400;margin-top:2px;opacity:.85}
+.wrap{max-width:720px;margin:0 auto;padding:14px 12px}
+.bar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.bar .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.bar .big{font-size:22px;font-weight:800;color:var(--blue)}
+.bar .lab{font-size:12.5px;color:var(--ink-soft)}
+.track{height:8px;border-radius:99px;background:var(--cream-2);margin-top:10px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--gold-lt),var(--gold));width:0;transition:width .3s}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+input[type=text],input[type=number],input[type=password]{font-family:inherit;font-size:15px;padding:9px 11px;
+  border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);min-width:0}
+input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.btn{font-family:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card);color:var(--blue);cursor:pointer}
+.btn.gold{background:var(--gold);border-color:var(--gold-d);color:#fff}
+.btn:disabled{opacity:.5}
+.search{flex:1}
+.chips{display:flex;gap:6px;margin-bottom:12px}
+.chip{flex:1;font-family:inherit;font-size:13.5px;font-weight:600;padding:9px 4px;border-radius:99px;
+  border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.lockbox{display:flex;gap:8px;align-items:center;margin-bottom:12px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.lockbox .txt{flex:1;font-size:13px;color:var(--ink-soft)}
+.lockbox input{width:96px}
+h2.grp{font-size:13.5px;letter-spacing:2px;color:var(--gold-d);margin:18px 4px 8px;
+  display:flex;align-items:center;gap:8px;font-weight:700}
+h2.grp::after{content:"";flex:1;height:1px;background:var(--gold-lt)}
+h2.grp em{font-style:normal;font-size:12px;color:var(--gold-d);opacity:.75;letter-spacing:0}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+  margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.item.done{border-color:var(--gold);background:#FBF1DC}
+.who{flex:1;min-width:0}
+.who .name{font-size:16.5px;font-weight:600;color:var(--blue)}
+.who .title{font-size:12px;color:var(--ink-soft);margin-top:1px}
+.chk{width:34px;height:34px;flex:0 0 34px;border-radius:9px;border:2px solid var(--gold-lt);background:#fff;
+  cursor:pointer;display:grid;place-items:center;font-size:19px;color:transparent;font-weight:800}
+.chk.on{background:var(--gold);border-color:var(--gold-d);color:#fff}
+.chk.ro{cursor:default;border-style:dashed}
+.chk.ro.on{border-style:solid;opacity:.85}
+.money{width:100px;flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.money::-webkit-outer-spin-button,.money::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.moneyRO{width:100px;flex:0 0 100px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;color:var(--ink-soft)}
+.empty{background:var(--card);border:1px dashed var(--gold);border-radius:12px;padding:26px 16px;
+  text-align:center;color:var(--ink-soft);font-size:14.5px}
+.foot{text-align:center;font-size:12px;color:var(--ink-soft);padding:24px 12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--blue);color:#fff;
+  padding:11px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+/* 登入 */
+.gate{position:fixed;inset:0;z-index:200;background:linear-gradient(180deg,#F3E6C9,#FAF2E0);
+  display:grid;place-items:center;padding:24px}
+.gate .box{width:100%;max-width:320px;text-align:center}
+.gate .seal{width:76px;height:76px;font-size:38px;margin:0 auto 18px;border-width:3px}
+.gate h2{font-size:21px;color:var(--blue);margin:0 0 4px;font-weight:700}
+.gate p{font-size:13px;color:var(--ink-soft);margin:0 0 22px}
+.gate input{width:100%;text-align:center;font-size:17px;padding:13px;letter-spacing:4px;margin-bottom:10px}
+.gate button{width:100%;padding:13px;font-size:16px}
+.gate .err{font-size:13px;color:#B4453A;height:18px;margin-top:8px}
+/* 選單 */
+.menu{max-width:420px;margin:30px auto;padding:0 16px}
+.menu .mtitle{text-align:center;font-size:17px;color:var(--blue);font-weight:700;margin-bottom:20px}
+.mcard{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:18px 16px;
+  margin-bottom:12px;display:flex;align-items:center;gap:14px;cursor:pointer;width:100%;
+  font-family:inherit;text-align:left}
+.mcard .ic{font-size:26px;line-height:1}
+.mcard .mt{font-size:16.5px;color:var(--blue);font-weight:600}
+.mcard .ms{font-size:12px;color:var(--ink-soft);margin-top:2px}
+/* 通訊錄 */
+.dirhead{font-size:15.5px;color:var(--blue);font-weight:700;line-height:1.4;margin:2px 4px 2px}
+.dirsub{font-size:11.5px;color:var(--ink-soft);margin:0 4px 12px}
+.note{background:var(--cream-2);border-left:4px solid var(--gold);padding:11px 13px;margin-bottom:12px;
+  font-size:13px;color:var(--gold-d);border-radius:0 8px 8px 0}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.pc .l1{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pc .nm{font-size:16.5px;font-weight:600;color:var(--blue)}
+.pc .cb{font-size:11px;color:var(--gold-d);background:var(--cream-2);border-radius:99px;padding:2px 8px}
+.pc .tt{font-size:12px;color:var(--ink-soft)}
+.pc a{display:block;margin-top:6px;font-size:14.5px;color:var(--gold-d);text-decoration:none;word-break:break-all}
+.pc .na{display:block;margin-top:6px;font-size:13px;color:#C3B596}
+.pc .ad{margin-top:6px;font-size:12.5px;color:var(--ink-soft)}
+.cbline{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft);margin:0 4px 12px}
+.up{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px}
+.up h3{margin:0 0 3px;font-size:14.5px;color:var(--blue)}
+.up p{margin:0 0 11px;font-size:12px;color:var(--ink-soft)}
+.ver{background:var(--cream);border:1px solid var(--gold-lt);border-radius:10px;padding:9px 11px;
+  font-size:12.5px;color:var(--ink-soft);margin-bottom:10px}
+.ver b{display:block;font-size:15px;color:var(--blue);font-weight:600}
+@media print{header,.tools,.chips,.lockbox,.btn,.toast,.up{display:none}body{background:#fff;padding:0}}
 </style>
 </head>
 <body>
 
-<div id="gate">
-  <div class="box">
-    <div class="clip">🧾</div>
-    <h1>代墊記帳本</h1>
-    <p>出過的帳，一筆都不會忘</p>
-    <input id="pass" type="password" inputmode="numeric" placeholder="輸入密碼" autocomplete="off">
-    <button id="gateBtn">開啟</button>
-    <div id="gateErr"></div>
+<header id="hd" style="display:none">
+  <button class="back" id="backBtn">← 返回選單</button>
+  <div class="brand">
+    <div class="seal">K</div>
+    <div>
+      <h1 id="hTitle">淡水國際同濟會　第28屆</h1>
+      <p id="hSub">2026–2027年　會務追蹤表</p>
+    </div>
   </div>
-</div>
-
-<header>
-  <div class="wrap">
-    <div class="brand">
-      <h1>代墊記帳本</h1>
-      <button id="lock">鎖上</button>
-    </div>
-    <div class="big-label">尚未請款</div>
-    <div class="big-amt mono"><small>NT$</small><span id="unpaid">0</span></div>
-    <div class="sub-row">
-      <div>
-        <div class="sub-label" id="mLabel">本月支出</div>
-        <div class="sub-val mono">NT$<span id="mTotal">0</span></div>
-      </div>
-      <div>
-        <div class="sub-label">未請款筆數</div>
-        <div class="sub-val mono"><span id="unpaidN">0</span> 筆</div>
-      </div>
-    </div>
+  <div class="tabs" id="clubTabs" style="display:none">
+    <button class="tab on" data-tab="fee">會費繳交<small id="tb1">—</small></button>
+    <button class="tab" data-tab="tie">領帶領取<small id="tb2">—</small></button>
+    <button class="tab" data-tab="award">會內敘獎<small id="tb3">—</small></button>
+  </div>
+  <div class="tabs" id="dirTabs" style="display:none">
+    <button class="tab on" data-dtab="區職人員">區職人員<small id="db1">—</small></button>
+    <button class="tab" data-dtab="分會六長">分會六長<small id="db2">—</small></button>
   </div>
 </header>
 
-<main class="wrap">
-  <div class="tools">
-    <input id="q" type="search" placeholder="搜尋內容…">
-    <select id="month"></select>
-  </div>
-  <div class="chips">
-    <button class="chip" id="cAll" aria-pressed="true">全部</button>
-    <button class="chip" id="cUnpaid" aria-pressed="false">只看未請款</button>
-    <button class="chip" id="cRecp" aria-pressed="false">有收據</button>
-  </div>
-  <div id="list"><div class="empty"><div>⏳</div><div>載入中…</div></div></div>
-</main>
-
-<button id="fab">＋ 記一筆</button>
-
-<div id="sheet">
-  <div class="bg" data-close></div>
-  <div class="card">
-    <div class="sheet-head">
-      <h2 id="sheetTitle">記一筆</h2>
-      <button data-close>關閉</button>
-    </div>
-    <label for="f_date">年月日</label>
-    <input id="f_date" class="fld" type="date">
-    <label for="f_item">內容</label>
-    <input id="f_item" class="fld" type="text" placeholder="例：買茶水招待客戶">
-    <label for="f_amount">金額</label>
-    <input id="f_amount" class="fld" type="number" inputmode="decimal" placeholder="0">
-    <label for="f_note">備註（可不填）</label>
-    <input id="f_note" class="fld" type="text" placeholder="例：先跟出納報備過">
-    <label>收據</label>
-    <div id="drop">📷 點這裡拍照或選圖片</div>
-    <input id="f_file" type="file" accept="image/*" hidden>
-    <div id="prev"><img id="prevImg" alt="收據預覽"><button type="button" id="rmImg">移除這張收據</button></div>
-    <div class="rowck">
-      <input id="f_claimed" type="checkbox">
-      <label for="f_claimed">已請款</label>
-    </div>
-    <div class="acts">
-      <button class="btn-main" id="save">儲存</button>
-      <button class="btn-del" id="del" style="display:none">刪除</button>
-    </div>
+<div class="gate" id="gate">
+  <div class="box">
+    <div class="seal">K</div>
+    <h2>淡水國際同濟會</h2>
+    <p>第28屆　2026–2027</p>
+    <input type="password" id="gpw" inputmode="numeric" placeholder="輸入密碼" autocomplete="off">
+    <button class="btn gold" id="goBtn">開啟</button>
+    <div class="err" id="gerr"></div>
   </div>
 </div>
 
-<div id="viewer"><button id="vClose">✕</button><img id="vImg" alt="收據"></div>
-<div id="toast"></div>
+<div class="menu" id="menu" style="display:none">
+  <div class="mtitle">請選擇要查看的項目</div>
+  <button class="mcard" data-go="club">
+    <span class="ic">📋</span>
+    <span><span class="mt">會務資訊</span><span class="ms">會費・領帶・敘獎</span></span>
+  </button>
+  <button class="mcard" data-go="dir">
+    <span class="ic">📇</span>
+    <span><span class="mt">通訊錄</span><span class="ms">區職人員・分會六長</span></span>
+  </button>
+</div>
 
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<div class="wrap" id="app" style="display:none">
+  <div class="lockbox" id="lockbox">
+    <span class="txt" id="lockTxt">檢視模式・輸入密碼可編輯</span>
+    <input type="password" id="pw" inputmode="numeric" placeholder="密碼" autocomplete="off">
+    <button class="btn gold" id="unlockBtn">解鎖</button>
+    <button class="btn" id="lockBtn" style="display:none">鎖定</button>
+  </div>
 
-/* ============ 設定：密碼改這一行 ============ */
-const PASSCODE = "1234";
-const SUPABASE_URL = "https://hhnbymkhpthdnbhtxlsx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_kTQT2AaMHZf4tKNbfdVjEA_hQFuwaCi";
-/* =========================================== */
+  <!-- 會務資訊 -->
+  <div id="clubView">
+    <div class="bar">
+      <div class="row"><span class="lab" id="statLab">—</span><span class="big" id="statBig">—</span></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <div class="chips">
+      <button class="chip on" data-f="all">全部</button>
+      <button class="chip" data-f="todo" id="chipTodo">未完成</button>
+      <button class="chip" data-f="done" id="chipDone">已完成</button>
+    </div>
+    <div class="tools">
+      <input type="text" class="search" id="q" placeholder="搜尋姓名或職稱…">
+      <button class="btn" id="copyBtn">複製未完成</button>
+      <button class="btn" id="csvBtn">匯出 CSV</button>
+    </div>
+    <div class="tools" id="feeTools" style="display:none">
+      <input type="number" id="defAmt" value="3000" step="100" style="width:110px">
+      <button class="btn gold" id="applyAll">套用金額到全部</button>
+      <button class="btn" id="applyEmpty">只套用空白的</button>
+    </div>
+    <div id="list"></div>
+  </div>
 
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-const $ = id => document.getElementById(id);
-const nt = n => Math.round(Number(n) || 0).toLocaleString("en-US");
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  <!-- 通訊錄 -->
+  <div id="dirView" style="display:none">
+    <div class="dirhead">第53屆 2026–2027<br>北一區區職人員名冊</div>
+    <div class="dirsub" id="dirSub">讀取中…</div>
+    <div class="note" id="dirNote" style="display:none"></div>
 
-let rows = [], editing = null, pendingFile = null, removeReceipt = false;
-let filter = "all";
-
-/* ---------- 密碼閘 ---------- */
-const openApp = () => { $("gate").style.display = "none"; load(); };
-$("gateBtn").onclick = () => {
-  if ($("pass").value.trim() === PASSCODE) { localStorage.setItem("bk_ok", "1"); openApp(); }
-  else { $("gateErr").textContent = "密碼不對，再試一次"; $("pass").value = ""; }
-};
-$("pass").onkeydown = e => { if (e.key === "Enter") $("gateBtn").click(); };
-$("lock").onclick = () => { localStorage.removeItem("bk_ok"); location.reload(); };
-if (localStorage.getItem("bk_ok") === "1") openApp(); else $("pass").focus();
-
-/* ---------- 讀取 ---------- */
-async function load() {
-  const { data, error } = await sb.from("expenses").select("*")
-    .order("spend_date", { ascending: false }).order("created_at", { ascending: false });
-  if (error) {
-    $("list").innerHTML = `<div class="empty"><div>⚠️</div><div>連不上後台：${esc(error.message)}</div></div>`;
-    return;
-  }
-  rows = data || [];
-  buildMonths();
-  render();
-}
-
-function buildMonths() {
-  const set = [...new Set(rows.map(r => r.spend_date.slice(0, 7)))].sort().reverse();
-  const cur = $("month").value;
-  $("month").innerHTML = `<option value="">全部月份</option>` +
-    set.map(m => `<option value="${m}">${m.slice(0,4)}年${m.slice(5,7)}月</option>`).join("");
-  if (cur && (cur === "" || set.includes(cur))) $("month").value = cur;
-}
-
-/* ---------- 畫面 ---------- */
-function render() {
-  const kw = $("q").value.trim().toLowerCase();
-  const mo = $("month").value;
-
-  let view = rows.filter(r => {
-    if (mo && !r.spend_date.startsWith(mo)) return false;
-    if (filter === "unpaid" && r.claimed) return false;
-    if (filter === "receipt" && !r.receipt_path) return false;
-    if (kw && !((r.item || "") + " " + (r.note || "")).toLowerCase().includes(kw)) return false;
-    return true;
-  });
-
-  const unpaid = rows.filter(r => !r.claimed);
-  $("unpaid").textContent = nt(unpaid.reduce((s, r) => s + Number(r.amount), 0));
-  $("unpaidN").textContent = unpaid.length;
-
-  const scope = mo ? rows.filter(r => r.spend_date.startsWith(mo)) : rows;
-  $("mLabel").textContent = mo ? `${mo.slice(5,7)}月支出` : "全部支出";
-  $("mTotal").textContent = nt(scope.reduce((s, r) => s + Number(r.amount), 0));
-
-  if (!view.length) {
-    $("list").innerHTML = rows.length
-      ? `<div class="empty"><div>🔍</div><div>這個條件下沒有帳</div></div>`
-      : `<div class="empty"><div>🧾</div><div>還沒有任何一筆，按右下角記第一筆</div></div>`;
-    return;
-  }
-
-  let html = "", lastM = "";
-  for (const r of view) {
-    const m = r.spend_date.slice(0, 7);
-    if (m !== lastM) {
-      lastM = m;
-      const sum = view.filter(x => x.spend_date.startsWith(m)).reduce((s, x) => s + Number(x.amount), 0);
-      html += `<div class="mgroup"><h2>${m.slice(0,4)}年${m.slice(5,7)}月</h2><hr><em class="mono">NT$${nt(sum)}</em></div>`;
-    }
-    const d = r.spend_date.split("-");
-    html += `
-    <div class="stub ${r.claimed ? "paid" : ""}">
-      <div class="stub-top">
-        <div>
-          <div class="stub-date mono">${d[0]}.${d[1]}.${d[2]}</div>
-          <div class="stub-item">${esc(r.item)}</div>
-          ${r.note ? `<div class="stub-note">${esc(r.note)}</div>` : ""}
-        </div>
-        <div class="stub-amt mono">${nt(r.amount)}</div>
+    <div class="up" id="upBox" style="display:none">
+      <h3>更新通訊錄</h3>
+      <p>上傳維護用的 Excel，覆蓋現有名冊</p>
+      <div class="ver" id="verBox">目前線上版本：尚未同步</div>
+      <div class="tools">
+        <input type="file" id="xlsFile" accept=".xlsx,.xls" style="font-size:13px;flex:1">
       </div>
-      <div class="stub-bot">
-        ${r.receipt_path ? `<button class="tag recp" data-view="${esc(r.receipt_path)}">🧾 看收據</button>` : ""}
-        <button class="tag pay ${r.claimed ? "on" : ""}" data-toggle="${r.id}">
-          ${r.claimed ? "✓ 已請款" : "○ 未請款"}
-        </button>
-        <button class="tag edit" data-edit="${r.id}">編輯</button>
+      <div class="tools">
+        <button class="btn gold" id="upBtn" disabled>確認更新</button>
+        <button class="btn" id="dlBtn">下載目前名冊 Excel</button>
       </div>
-      ${r.claimed ? `<div class="stamp">已請款<span>PAID</span></div>` : ""}
-    </div>`;
+    </div>
+
+    <div class="tools">
+      <input type="text" class="search" id="dq" placeholder="搜尋姓名・會別・職稱…">
+    </div>
+    <label class="cbline"><input type="checkbox" id="showAddr"> 顯示地址</label>
+    <div id="dlist"></div>
+  </div>
+
+  <div class="foot">資料儲存於 Supabase，多人即時同步。</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SB_URL="https://hhnbymkhpthdnbhtxlsx.supabase.co";
+const T_M="kiwanis_members",T_C="kiwanis_contacts",T_X="kiwanis_meta";
+const VA={s:"NxMONceSWTBeHdZ2PQro8g==",i:"vJiOblCm2hWt/jrr",
+  c:"nDCPvqTUZUJEUt/K0SGuQfpaqqTz5IWimP2mglPSWp5E/B6o+wTjYPwvnZvW+jC12FUCoxwhrYqW1QNIOuE=",n:250000};
+const VB={s:"9mBywGc8A/0oJhc6PykMmA==",i:"kPs54i9/LJxFQGCc",
+  c:"ChrcgmtAwij32TDOm0S6GgplS/fXjuwcc4ef1RRkETM=",n:250000};
+let db=null;
+
+const b64=t=>Uint8Array.from(atob(t),ch=>ch.charCodeAt(0));
+async function openVault(pass,V){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(V.s),iterations:V.n,hash:"SHA-256"},
+    base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  return new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(V.i)},key,b64(V.c)));
+}
+
+const SEED_M=[["幹部","會長","李益欽",1,1],["幹部","前任會長","潘文進",1,1],["幹部","候任會長","連政凱",1,1],["幹部","副會長","林永龍",1,1],["幹部","副會長","王治政",1,1],["幹部","理事","張鈞霖",1,1],["幹部","理事","陳國華",1,1],["幹部","理事","陳志成",0,0],["幹部","理事","黃自強",1,1],["幹部","常務監事","呂承男",1,1],["幹部","監事","杜凱恩",1,1],["幹部","監事","紀傑元",1,1],["幹部","法制顧問","陳福音",1,1],["幹部","秘書長","方思喻",1,1],["幹部","財務長","黃錦紹",1,1],["幹部","第26屆會長","曾健瑞",1,1],["歷屆會長","創會長","謝安棋",1,1],["歷屆會長","第4屆會長","盧忠義",1,1],["歷屆會長","第6屆會長","林勝弘",1,1],["歷屆會長","第7屆會長","盧金龍",1,1],["歷屆會長","第9屆會長","李建勝",1,1],["歷屆會長","第10屆會長","周清源",1,1],["歷屆會長","第12屆會長","林國峯",1,1],["歷屆會長","第13屆會長","陳銘志",1,1],["歷屆會長","第14屆會長","陳煌林",0,0],["歷屆會長","第15屆會長","謝仲信",1,1],["歷屆會長","第16屆會長","許春敏",1,1],["歷屆會長","第18屆會長","王燦煌",1,1],["歷屆會長","第19屆會長","魏培文",1,1],["歷屆會長","第21屆會長","許隆華",1,1],["歷屆會長","第22屆會長","郭丁木",1,1],["歷屆會長","第24屆會長","盧春林",1,1],["歷屆會長","第25屆會長","游閔勇",1,1],["會兄","會兄","盧進財",0,1],["會兄","會兄","吳德銘",1,1],["會兄","會兄","紀景元",1,1],["會兄","會兄","黃梓榮",1,1],["會兄","會兄","周文烈",0,0],["會兄","會兄","陳文肯",0,0],["會兄","會兄","盧武揚",0,0],["會兄","會兄","林峻賢",1,1],["會兄","會兄","陳昆伸",0,0],["會兄","會兄","曾鈺澤",0,0],["會兄","會兄","林正偉",0,0],["會兄","會兄","王嘉偉",1,1],["會兄","會兄","施嘉鎮",1,0],["會兄","會兄","吳培協",0,0],["會兄","會兄","楊聰賓",1,1],["會兄","會兄","黃呈達",0,0]];
+const SEED_C=[{"cat":"區職人員","seq":0,"club":"淡水","title":"主席","name":"魏培文","phone":"0986-660-599","email":"Pei3858@gmail.com","addr":"251淡水區中正路一段59號","note":"原名冊為0386開頭，已依會方更正"},{"cat":"區職人員","seq":0,"club":"三重","title":"前任主席","name":"黃進礐","phone":"0910-010-611","email":"tm547380@yahoo.com.tw","addr":"241新北市三重區龍門路116號","note":""},{"cat":"區職人員","seq":0,"club":"世紀","title":"候任主席","name":"徐建民","phone":"0910-349-176","email":"kingsun92@gmail.com","addr":"208新北市金山區中山路241號","note":""},{"cat":"區職人員","seq":0,"club":"","title":"總會督導長","name":"張阿梅","phone":"","email":"","addr":"","note":"簽到表列為區督導長，電話與Email待補"},{"cat":"區職人員","seq":0,"club":"世紀","title":"督導長召集人","name":"林淯鰫","phone":"0933-101-639","email":"","addr":"基隆市中正路4號3樓","note":""},{"cat":"區職人員","seq":0,"club":"三重","title":"法制顧問","name":"廖瑞昇","phone":"0928-277-273","email":"a006699@ms48.hinet.net","addr":"新北市新店區安民街365巷1弄4號1樓","note":""},{"cat":"區職人員","seq":0,"club":"蘇澳港","title":"區務參議","name":"陳永祥","phone":"0932-266-329","email":"","addr":"270宜蘭縣蘇澳鎮金湖街64巷23號","note":""},{"cat":"區職人員","seq":0,"club":"冠麒","title":"區務參議","name":"高素真","phone":"0933-139-411","email":"","addr":"新北市新莊區中港路432巷11號7樓","note":""},{"cat":"區職人員","seq":0,"club":"淡水","title":"副主席","name":"游閔勇","phone":"0970-219-881","email":"aa0970219881@gmail.com","addr":"新北市淡水區崁頂三路89號8樓","note":""},{"cat":"區職人員","seq":0,"club":"如意","title":"副主席","name":"張育緹","phone":"0937-507-216","email":"iona313131@yahoo.com.tw","addr":"基隆市安樂區樂利二街62巷271號10F","note":""},{"cat":"區職人員","seq":0,"club":"蘇澳港","title":"副主席","name":"嚴宜堂","phone":"0912-530-520","email":"yyt262@yahoo.com.tw","addr":"265宜蘭縣羅東鎮樹人路1巷20弄10號","note":""},{"cat":"區職人員","seq":0,"club":"尊爵","title":"副主席","name":"尤得霖","phone":"0906-799-399","email":"yu0985301389@gmail.com","addr":"新北市新莊區建安街7號8樓","note":""},{"cat":"區職人員","seq":0,"club":"三重","title":"副主席","name":"紀曾傑","phone":"0960-538-078","email":"jay0731jay@yahoo.com.tw","addr":"新北市泰山區信華二街","note":""},{"cat":"區職人員","seq":0,"club":"淡水","title":"區秘書長","name":"王燦煌","phone":"0919-776-356","email":"whing441015@gmail.com","addr":"新北市淡水區大信街43號5樓","note":""},{"cat":"區職人員","seq":0,"club":"蘭陽","title":"區財務長","name":"錢芙青","phone":"0928-982-425","email":"amy0928982425@gmail.com","addr":"桃園市桃園區民有五街79號4樓","note":""},{"cat":"區職人員","seq":0,"club":"如意","title":"總執行長","name":"吳麗英","phone":"0972-066-828","email":"ying066828@yahoo.com.tw","addr":"台北市大安區光復南路288號3樓之5","note":""},{"cat":"區職人員","seq":0,"club":"淡水","title":"總召集長","name":"郭丁木","phone":"0928-800-529","email":"rfv10605@gmail.com","addr":"新北市公明街79號","note":""},{"cat":"區職人員","seq":0,"club":"蘭陽","title":"區教育長","name":"吳美惠","phone":"0932-263-547","email":"gb42899@gmail.com","addr":"宜蘭縣羅東鎮中正路112號2樓","note":""},{"cat":"區職人員","seq":0,"club":"新樹","title":"區事務長","name":"陳守柎","phone":"0937-032-297","email":"xz012677@yahoo.com.tw","addr":"三重區光復路1段68巷16號","note":""},{"cat":"區職人員","seq":0,"club":"如意","title":"副總執行長","name":"吴阿谨","phone":"09565320069","email":"Wu532069@yahoo.com.tw","addr":"台北市信義路四段378巷5號4樓","note":"電話待確認"},{"cat":"區職人員","seq":0,"club":"新莊","title":"副總執行長","name":"黃滄意","phone":"0910-222-923","email":"tree.ice@msa.hinet.net","addr":"新北市新莊區建福路56號7樓","note":""},{"cat":"區職人員","seq":0,"club":"泰山","title":"副總執行長","name":"陳挺杰","phone":"0936-272-314","email":"jakchen1960@gmail.com","addr":"242新北市新莊區福壽街126-5號","note":""},{"cat":"區職人員","seq":0,"club":"宜蘭","title":"副總執行長","name":"蘇柏瑋","phone":"0916-140-128","email":"a0916140138@gmail.com","addr":"新北市汐止區橫科路52巷16號5樓","note":""},{"cat":"區職人員","seq":0,"club":"蘆江","title":"副總執行長","name":"廖本元","phone":"0922-954-852","email":"","addr":"新北市三重區中正北路361號6樓之6","note":""},{"cat":"區職人員","seq":0,"club":"新莊","title":"副總召集長","name":"黃婉麗","phone":"0979-020-904","email":"wanlihuang15@gmail.com","addr":"新北市三重區錦通街20號","note":""},{"cat":"區職人員","seq":0,"club":"世紀","title":"副總召集長","name":"劉德盛","phone":"0933-239-708","email":"","addr":"基隆市八堵路114號","note":""},{"cat":"區職人員","seq":0,"club":"五股","title":"副總召集長","name":"劉錫祖","phone":"0933-583-395","email":"a0916757326@gmail.com","addr":"北市八德路三段437巷10號三樓","note":""},{"cat":"區職人員","seq":0,"club":"新莊","title":"副總召集長","name":"王偉燦","phone":"0939-687-715","email":"aa0939687715@icloud.com","addr":"桃園市龜山區復興三路6 1號1樓","note":""},{"cat":"區職人員","seq":0,"club":"淡水","title":"副總召集長","name":"曾健瑞","phone":"0925-988-805","email":"38magic@gmail.com","addr":"新北市淡水區公明街71號1F","note":""},{"cat":"區職人員","seq":0,"club":"宜蘭","title":"副總召集長","name":"雷遠誌","phone":"0932-090-575","email":"s090575@gmail.com","addr":"宜蘭市陽明二路28號","note":""},{"cat":"分會六長","seq":1,"club":"基隆","title":"會長","name":"張文正","phone":"0933-241-391","email":"kll6378kll6378@gmail.com","addr":"基隆市中正區立德路94號3樓","note":""},{"cat":"分會六長","seq":1,"club":"基隆","title":"前任會長","name":"陳歷翔","phone":"0937-093-815","email":"","addr":"基隆市暖暖區暖暖街239號3樓","note":""},{"cat":"分會六長","seq":1,"club":"基隆","title":"候任會長","name":"林崧琪","phone":"0937-874-919","email":"","addr":"基隆市暖暖區過港路204-4號1樓","note":""},{"cat":"分會六長","seq":1,"club":"基隆","title":"秘書長","name":"簡奇良","phone":"0988-224-543","email":"sanho_chien@sanhocs.com.tw","addr":"基隆市仁愛區忠三路99號605室","note":""},{"cat":"分會六長","seq":1,"club":"基隆","title":"財務長","name":"王崇賢","phone":"0931-136-209","email":"","addr":"基隆市暖暖區暖暖街16巷39-16號","note":""},{"cat":"分會六長","seq":1,"club":"基隆","title":"常務監事","name":"林志強","phone":"0910-252-503","email":"","addr":"基隆市中山區安一路1號5樓","note":""},{"cat":"分會六長","seq":2,"club":"台北縣","title":"會長","name":"巫明洲","phone":"0921-846-495","email":"","addr":"新北市八里區頂寮二街49號6樓","note":""},{"cat":"分會六長","seq":2,"club":"台北縣","title":"前任會長","name":"施安邦","phone":"0916-240-030","email":"","addr":"新北市蘆洲區信義路259巷22號3稜","note":""},{"cat":"分會六長","seq":2,"club":"台北縣","title":"秘書長","name":"沈憶君","phone":"0933-041-206","email":"","addr":"新北市新店區玫瑰路10號3樓","note":""},{"cat":"分會六長","seq":2,"club":"台北縣","title":"財務長","name":"陳春","phone":"0989-383-807","email":"","addr":"新北市蘆洲區長安街285巷5弄4號3樓","note":""},{"cat":"分會六長","seq":2,"club":"台北縣","title":"常務監事","name":"鄭明金","phone":"0903-568-138","email":"","addr":"新北市新莊區化成路113巷31號","note":""},{"cat":"分會六長","seq":3,"club":"新莊","title":"會長","name":"林俊星","phone":"0932-083-236","email":"ericlin5568@gmail.com","addr":"新北市新莊區富國路22巷25號5樓","note":""},{"cat":"分會六長","seq":3,"club":"新莊","title":"前任會長","name":"許福進","phone":"0925-302-667","email":"x8988765@ms48.hinet.net","addr":"新北市樹林區俊英街248巷19號","note":""},{"cat":"分會六長","seq":3,"club":"新莊","title":"候任會長","name":"朱瑞光","phone":"0932-304-204","email":"dickchu99@gmail.com","addr":"新北市三重區中華路2巷23號1樓","note":""},{"cat":"分會六長","seq":3,"club":"新莊","title":"秘書長","name":"葉汶鑫","phone":"0933-866-992","email":"civic_coupe_b18c@yahoo.com.tw","addr":"新北市新莊區建福路54號7樓","note":""},{"cat":"分會六長","seq":3,"club":"新莊","title":"財務長","name":"黃俊源","phone":"0977-123-543","email":"boss08575757@gmail.com","addr":"桃園市龜山區文化五路183號1樓","note":""},{"cat":"分會六長","seq":3,"club":"新莊","title":"常務監事","name":"葉誼珅","phone":"0966-708-328","email":"yp32118@hotmail.com","addr":"新北市新莊區西盛街395巷46號","note":""},{"cat":"分會六長","seq":4,"club":"羅東","title":"會長","name":"馮世儒","phone":"0937-333-149","email":"fuse.andy@gmail.com","addr":"宜蘭市健康路一段59號","note":""},{"cat":"分會六長","seq":4,"club":"羅東","title":"前任會長","name":"呂吉淋","phone":"0928-268-530","email":"kepo@kimo.com","addr":"宜蘭縣員山鄉惠深二路一段66巷6號","note":""},{"cat":"分會六長","seq":4,"club":"羅東","title":"候任會長","name":"戴偉力","phone":"0910-071-329","email":"daviddd3138@yahoo.com.tw","addr":"宜蘭縣五結鄉中正西路37-1號","note":""},{"cat":"分會六長","seq":4,"club":"羅東","title":"秘書長","name":"簡石英","phone":"0920-776-287","email":"ho_da09713818@yahoo.com.tw","addr":"宜蘭縣羅東鎮興東南路172號","note":""},{"cat":"分會六長","seq":4,"club":"羅東","title":"財務長","name":"陳大傑","phone":"0935-260-960","email":"jay620424@gmail.com","addr":"宜蘭縣羅東鎮天津路50巷8號","note":""},{"cat":"分會六長","seq":4,"club":"羅東","title":"常務監事","name":"陳柏宇","phone":"0920-667-273","email":"adni777@gmail.com","addr":"宜蘭市環市東路三段27號","note":""},{"cat":"分會六長","seq":5,"club":"如意","title":"會長","name":"簡楊素月","phone":"0932-354-732","email":"","addr":"基市仁愛區愛五路10巷3號","note":""},{"cat":"分會六長","seq":5,"club":"如意","title":"前任會長","name":"李素真","phone":"0932-924-500","email":"","addr":"基市安樂區樂利三街86號2樓","note":""},{"cat":"分會六長","seq":5,"club":"如意","title":"秘書長","name":"朱蘭香","phone":"0905-297-051","email":"","addr":"基市安樂區安和二街2-1號2樓","note":""},{"cat":"分會六長","seq":5,"club":"如意","title":"財務長","name":"陳琬淇","phone":"0963-122-097","email":"wanchi18@gmail.com","addr":"基市暖暖區源遠路297巷90號6樓","note":""},{"cat":"分會六長","seq":5,"club":"如意","title":"常務監事","name":"羅彩月","phone":"0936-757-878","email":"","addr":"基隆市暖暖區暖暖街145號3樓","note":""},{"cat":"分會六長","seq":6,"club":"泰山","title":"會長","name":"吳佑軒","phone":"0928-520-262","email":"j520cherry@gmail.com","addr":"台北市信義區基隆路二段125號10樓之三","note":""},{"cat":"分會六長","seq":6,"club":"泰山","title":"前任會長","name":"陳志浩","phone":"0930-970-241","email":"do.ly@hotmail.com.tw","addr":"新北市三重區忠孝路三段99巷18號2樓","note":""},{"cat":"分會六長","seq":6,"club":"泰山","title":"候任會長","name":"鄭堡金","phone":"0970-613-041","email":"jiahe.steel@gmail.com","addr":"新北市三重區三和路四段215巷25號","note":""},{"cat":"分會六長","seq":6,"club":"泰山","title":"秘書長","name":"鄭堡金","phone":"0970-613-041","email":"jiahe.steel@gmail.com","addr":"新北市三重區三和路四段215巷25號","note":""},{"cat":"分會六長","seq":6,"club":"泰山","title":"財務長","name":"劉興家","phone":"0919-224-896","email":"singa6529@yahoo.com.tw","addr":"台北市士林區天母東路69巷29號2樓","note":""},{"cat":"分會六長","seq":6,"club":"泰山","title":"常務監事","name":"李清木","phone":"0987-259-449","email":"glk2999@gmail.com","addr":"新北市泰山區莊泰路1635號13樓","note":""},{"cat":"分會六長","seq":7,"club":"世紀","title":"會長","name":"黃兆憲","phone":"0936-159-398","email":"chaohsienhuang@gmail.com","addr":"基隆市安樂區樂利三街32巷16號1樓","note":""},{"cat":"分會六長","seq":7,"club":"世紀","title":"前任會長","name":"吳孟偉","phone":"0936-156-330","email":"","addr":"基隆市信義區信一路68號","note":""},{"cat":"分會六長","seq":7,"club":"世紀","title":"候任會長","name":"林洪泉","phone":"0900-057-418","email":"","addr":"基隆市仁愛區南新街31巷10號","note":""},{"cat":"分會六長","seq":7,"club":"世紀","title":"秘書長","name":"陳均韋","phone":"0928-959-262","email":"m18914958880@gmail.com","addr":"基隆市中山區中和路85巷5弄29號","note":""},{"cat":"分會六長","seq":7,"club":"世紀","title":"財務長","name":"朱良洲","phone":"0910-140-150","email":"success0928@yahoo.com.tw","addr":"新北市萬里區瑪鋉路30巷30號4樓","note":""},{"cat":"分會六長","seq":7,"club":"世紀","title":"常務監事","name":"黃文輝","phone":"0932-385-437","email":"385437@gmail.com","addr":"基隆市七堵區崇孝街42巷37號2樓","note":""},{"cat":"分會六長","seq":8,"club":"三重","title":"會長","name":"王銘光","phone":"0983-332-899","email":"","addr":"新北市三重區後竹圍街10號","note":""},{"cat":"分會六長","seq":8,"club":"三重","title":"前任會長","name":"林衍承","phone":"9832-065532","email":"","addr":"新北市三重區名源街46號6樓","note":"電話待確認"},{"cat":"分會六長","seq":8,"club":"三重","title":"秘書長","name":"林衍承","phone":"9832-065532","email":"","addr":"新北市三重區名源街46號6樓","note":"電話待確認"},{"cat":"分會六長","seq":8,"club":"三重","title":"財務長","name":"王永盛","phone":"0918-320-072","email":"","addr":"宜蘭縣礁溪鄉白雲六路7巷6-1號","note":""},{"cat":"分會六長","seq":8,"club":"三重","title":"常務監事","name":"廖瑞昇","phone":"0928-277-273","email":"","addr":"新北新店區安民街365巷1弄4號1樓","note":""},{"cat":"分會六長","seq":9,"club":"菩提","title":"會長","name":"余麗香","phone":"","email":"","addr":"新北市板橋區中山路二段416巷36-3號3樓","note":""},{"cat":"分會六長","seq":9,"club":"菩提","title":"前任會長","name":"詹燕娟","phone":"02-22014393","email":"","addr":"桃園市桃園區雙庫街92巷13號","note":"電話待確認"},{"cat":"分會六長","seq":9,"club":"菩提","title":"秘書長","name":"邱月霞","phone":"0933-838-270","email":"","addr":"桃園市蘆竹區南山路56巷5號","note":""},{"cat":"分會六長","seq":9,"club":"菩提","title":"財務長","name":"張素蘭","phone":"02-22014393","email":"","addr":"新北市新莊區豐年街88號","note":"電話待確認"},{"cat":"分會六長","seq":9,"club":"菩提","title":"常務監事","name":"陳嘉凌","phone":"0937-186-198","email":"","addr":"新北市新莊區豐年街90巷16號","note":""},{"cat":"分會六長","seq":10,"club":"蘇澳港","title":"會長","name":"江政倫","phone":"0932-302-683","email":"hirosueian@hotmail.com","addr":"宜蘭縣礁溪鄉武暖路7-2號","note":""},{"cat":"分會六長","seq":10,"club":"蘇澳港","title":"前任會長","name":"歐文凱","phone":"0980-791-501","email":"","addr":"宜蘭縣蘇澳鎮聖賢路13號8樓","note":""},{"cat":"分會六長","seq":10,"club":"蘇澳港","title":"秘書長","name":"黃乾銘","phone":"0972-524-605","email":"","addr":"宜蘭縣蘇澳鎮祥和路360巷13號","note":""},{"cat":"分會六長","seq":10,"club":"蘇澳港","title":"財務長","name":"陳佑仁","phone":"0979-041-543","email":"","addr":"宜蘭縣蘇澳鎮南安路212號","note":""},{"cat":"分會六長","seq":10,"club":"蘇澳港","title":"常務監事","name":"蕭國清","phone":"0937-911-487","email":"","addr":"宜蘭縣冬山鄉三福路165號","note":""},{"cat":"分會六長","seq":11,"club":"宜蘭","title":"會長","name":"陳世彬","phone":"0912-431-188","email":"shihpin1228@gmail.com","addr":"宜蘭縣礁溪鄉白雲二路77巷31號","note":""},{"cat":"分會六長","seq":11,"club":"宜蘭","title":"前任會長","name":"何振昌","phone":"0937-162-968","email":"a2327@hcpaper.com.tw","addr":"宜蘭市中興路308號","note":""},{"cat":"分會六長","seq":11,"club":"宜蘭","title":"候任會長","name":"楊文安","phone":"0937-453-901","email":"bird0331@icloud.com","addr":"宜蘭市河濱北路628巷12號","note":""},{"cat":"分會六長","seq":11,"club":"宜蘭","title":"秘書長","name":"雷遠誌","phone":"0932-090-575","email":"s090575@gmail.com","addr":"宜蘭市陽明二路28號","note":""},{"cat":"分會六長","seq":11,"club":"宜蘭","title":"財務長","name":"黃添宗","phone":"0910-299-009","email":"kg19871127@yahoo.com.tw","addr":"宜蘭縣冬山鄉冬山路三段322號","note":""},{"cat":"分會六長","seq":11,"club":"宜蘭","title":"常務監事","name":"簡千富","phone":"0989-115-144","email":"bigwhite0917@gmail.com","addr":"宜蘭市慈安路10巷2號3樓之三","note":""},{"cat":"分會六長","seq":12,"club":"蘆洲","title":"會長","name":"張珍珍","phone":"0933-592-122","email":"b0933592122@gmail.com","addr":"新北市蘆洲區民族路85巷12弄3號1樓","note":""},{"cat":"分會六長","seq":12,"club":"蘆洲","title":"前任會長","name":"華愛珍","phone":"0915-173-703","email":"janehua0630@gmail.com","addr":"新北市蘆洲區光華路46巷34-3號8樓","note":""},{"cat":"分會六長","seq":12,"club":"蘆洲","title":"候任會長","name":"官大清","phone":"0928-230-105","email":"","addr":"新北市新莊區五權一路7-2號2樓","note":""},{"cat":"分會六長","seq":12,"club":"蘆洲","title":"秘書長","name":"郭采蓁","phone":"0986-082-299","email":"q19751995@yahoo.com.tw","addr":"新北市蘆洲區復興路17巷1號2樓","note":""},{"cat":"分會六長","seq":12,"club":"蘆洲","title":"財務長","name":"許菀芸","phone":"0987-976-261","email":"yabewanyun@gmail.com","addr":"新北市板橋區華江九路59號18樓","note":""},{"cat":"分會六長","seq":12,"club":"蘆洲","title":"常務監事","name":"蔡永冬","phone":"0937-098-128","email":"hz13386@yahoo.com.tw","addr":"新北市三重區自強路四段3巷36號","note":""},{"cat":"分會六長","seq":13,"club":"淡水","title":"會長","name":"李益欽","phone":"0935-209-925","email":"andyle3@gmail.com","addr":"新北市淡水區新市一路一段281巷232號","note":""},{"cat":"分會六長","seq":13,"club":"淡水","title":"前任會長","name":"潘文進","phone":"0935-268-740","email":"jinhsu670727@gmail.com","addr":"新北市淡水區中山北路二段189巷38號5樓","note":""},{"cat":"分會六長","seq":13,"club":"淡水","title":"候任會長","name":"連政凱","phone":"0983-686-886","email":"dalien.ck@gmail.com","addr":"新北市淡水區中正東路二段103號","note":""},{"cat":"分會六長","seq":13,"club":"淡水","title":"秘書長","name":"方思喻","phone":"0935-996-555","email":"vw0935996555@yahoo.com.tw","addr":"新北市淡水區新民街310-1號","note":""},{"cat":"分會六長","seq":13,"club":"淡水","title":"財務長","name":"黃錦紹","phone":"0933-238-638","email":"au1aas@au.edu.tw","addr":"新北市淡水區新市一路3段101巷17弄32號5樓","note":""},{"cat":"分會六長","seq":13,"club":"淡水","title":"常務監事","name":"呂承男","phone":"0922-671-557","email":"","addr":"新北市淡水區中正路126號","note":""},{"cat":"分會六長","seq":14,"club":"五股","title":"會長","name":"鄭文凱","phone":"0936-336-295","email":"","addr":"新北市五股區中興路一段107號3樓","note":""},{"cat":"分會六長","seq":14,"club":"五股","title":"前任會長","name":"張名村","phone":"0911-508-057","email":"sam50906@gmail.com","addr":"新北市蘆洲區中山一路95巷22弄1號","note":""},{"cat":"分會六長","seq":14,"club":"五股","title":"秘書長","name":"蔡明順","phone":"0932-132-486","email":"bigbear1808@yahoo.com.tw","addr":"新北市五股區御史路124號","note":""},{"cat":"分會六長","seq":14,"club":"五股","title":"財務長","name":"李明坤","phone":"0933-809-812","email":"","addr":"新北市五股區成泰路一段189巷20之2號8樓","note":""},{"cat":"分會六長","seq":14,"club":"五股","title":"常務監事","name":"程文章","phone":"0937-036-586","email":"P67367@ms19.hinet.net","addr":"新北市三重區新北大道125號","note":""},{"cat":"分會六長","seq":15,"club":"芳薏","title":"會長","name":"王麗雯","phone":"0912-926-100","email":"","addr":"台北市大同區南京西路139號","note":""},{"cat":"分會六長","seq":15,"club":"芳薏","title":"前任會長","name":"王麗雯","phone":"0912-926-100","email":"","addr":"台北市大同區南京西路139號","note":""},{"cat":"分會六長","seq":15,"club":"芳薏","title":"候任會長","name":"李麗紅","phone":"0930-001-890","email":"","addr":"新北市三重區忠孝路三段16號6樓","note":""},{"cat":"分會六長","seq":15,"club":"芳薏","title":"秘書長","name":"沈美英","phone":"0933-811-135","email":"","addr":"新北市三重區新生街53號1樓","note":""},{"cat":"分會六長","seq":15,"club":"芳薏","title":"財務長","name":"陳玉釵","phone":"0912-004-967","email":"","addr":"新北市三重區三民街2號2樓","note":""},{"cat":"分會六長","seq":15,"club":"芳薏","title":"常務監事","name":"宋雪","phone":"0935-537-666","email":"","addr":"新北市新莊區化成路630巷19弄10號","note":""},{"cat":"分會六長","seq":16,"club":"爵妙","title":"會長","name":"張文良","phone":"0963-067-526","email":"","addr":"新北市新莊區新北大道二段187號","note":""},{"cat":"分會六長","seq":16,"club":"爵妙","title":"前任會長","name":"張珈嫚","phone":"0973-179-093","email":"a0973179093@gmail.com","addr":"新北市新莊區中華路二段205巷10號1樓","note":""},{"cat":"分會六長","seq":16,"club":"爵妙","title":"秘書長","name":"郭玉櫻","phone":"0933-007-270","email":"a0933007270@gmail.com","addr":"新北市泰山區明志路二段372巷5弄6號5樓","note":""},{"cat":"分會六長","seq":16,"club":"爵妙","title":"財務長","name":"李美蓉","phone":"0920-054-331","email":"meijung0429@gmail.com","addr":"新北市新莊區中正路893巷130號2樓","note":""},{"cat":"分會六長","seq":16,"club":"爵妙","title":"常務監事","name":"葉素卿","phone":"0988-789-782","email":"","addr":"新北市新莊區福壽街94巷18號2樓","note":""},{"cat":"分會六長","seq":17,"club":"尊爵","title":"會長","name":"蔡米絨","phone":"0939-036817\n02-29866566","email":"jammy88888@yahoo.com.tw","addr":"新北市三重區後竹圍街231號2樓","note":"電話待確認"},{"cat":"分會六長","seq":17,"club":"尊爵","title":"前任會長","name":"林麗玉","phone":"0976-106-545","email":"lamalin945@gmail.com","addr":"新北市新莊區建安街7號8樓","note":""},{"cat":"分會六長","seq":17,"club":"尊爵","title":"候任會長","name":"林聖元","phone":"0908-909-698","email":"rok690501@gmail.com","addr":"新北市中和區泰和街38巷28號2樓","note":""},{"cat":"分會六長","seq":17,"club":"尊爵","title":"秘書長","name":"廖榮隆","phone":"0932-361-715","email":"liaononno@gmail.com","addr":"新北市新莊區民安西路294號1樓","note":""},{"cat":"分會六長","seq":17,"club":"尊爵","title":"財務長","name":"陳炘惠","phone":"0922-617-699","email":"hsinhui0203@gmail.com","addr":"新北市新莊區四維路131巷19號","note":""},{"cat":"分會六長","seq":17,"club":"尊爵","title":"常務監事","name":"李岸","phone":"0935-778-917","email":"k52092500@yahoo.com.tw","addr":"新北市新莊區民安路37巷1號1樓","note":""},{"cat":"分會六長","seq":18,"club":"喜悅","title":"會長","name":"張秀霓","phone":"0972-150-117","email":"g0972150117@gmail.com","addr":"宜蘭縣五結鄉親河路1段226巷7號","note":""},{"cat":"分會六長","seq":18,"club":"喜悅","title":"前任會長","name":"林瑞貞","phone":"0937-164-560","email":"juichen64@yahoo.com.tw","addr":"宜蘭縣五結鄉親河路1段180巷5弄1號","note":""},{"cat":"分會六長","seq":18,"club":"喜悅","title":"候任會長","name":"張苙庭","phone":"0978-705-396","email":"her.form@msa.hinet.net","addr":"宜蘭縣羅東鎮羅莊街440號","note":""},{"cat":"分會六長","seq":18,"club":"喜悅","title":"秘書長","name":"張秀霓","phone":"0928-127-122","email":"miao127122@yahoo.com.tw","addr":"宜蘭縣羅東鎮純精路1段109號3樓","note":""},{"cat":"分會六長","seq":18,"club":"喜悅","title":"財務長","name":"卓慧萍","phone":"0919-313-899","email":"Ritacho88@gmail.com","addr":"宜蘭市泰山路95巷10號2樓","note":""},{"cat":"分會六長","seq":18,"club":"喜悅","title":"常務監事","name":"曾培雯","phone":"0912-860-383","email":"attorneytseng@gmail.com","addr":"宜蘭市進士路2段187巷7弄9號","note":""},{"cat":"分會六長","seq":19,"club":"冠麒","title":"會長","name":"華俞茹","phone":"0982-168-237","email":"oiii888@yahoo.com.tw","addr":"新北市泰山區新生路31巷12號6樓","note":""},{"cat":"分會六長","seq":19,"club":"冠麒","title":"前任會長","name":"謝松祺","phone":"0933-072-496","email":"","addr":"新北市蘆洲區成功路168號","note":""},{"cat":"分會六長","seq":19,"club":"冠麒","title":"候任會長","name":"陳建勳","phone":"0955-606-786","email":"","addr":"新北市新莊區新樹路172-18號3樓","note":""},{"cat":"分會六長","seq":19,"club":"冠麒","title":"秘書長","name":"游佳蓉","phone":"0983-076-060","email":"asd0983076060@gmail.com","addr":"新北市五股區芳洲九路58號20樓","note":""},{"cat":"分會六長","seq":19,"club":"冠麒","title":"財務長","name":"鄭月秋","phone":"0920-660-939","email":"","addr":"新北市五股區五工五路26號","note":""},{"cat":"分會六長","seq":19,"club":"冠麒","title":"常務監事","name":"高素真","phone":"0933-139-411","email":"","addr":"新北市新莊區中港路432巷11號7樓","note":""},{"cat":"分會六長","seq":21,"club":"好友","title":"會長","name":"陳彥霖","phone":"0986-712-499","email":"","addr":"新北市新莊區建安街76巷5弄13號5樓","note":""},{"cat":"分會六長","seq":21,"club":"好友","title":"前任會長","name":"陳易旗","phone":"0987-153-555","email":"lis3447@gmail.com","addr":"桃園市龜山區萬壽路一段241巷2弄2號14樓之4","note":""},{"cat":"分會六長","seq":21,"club":"好友","title":"秘書長","name":"鄭偉奕","phone":"0936-192-565","email":"vic031011@gmail.com","addr":"新北市三重區溪尾街325巷23號1樓","note":""},{"cat":"分會六長","seq":21,"club":"好友","title":"財務長","name":"傅聖皓","phone":"0933-050-859","email":"","addr":"新北市新莊區新樹路69-35號","note":""},{"cat":"分會六長","seq":21,"club":"好友","title":"常務監事","name":"張湧翔","phone":"0936-701-136","email":"","addr":"新北市新莊區民安西路245巷10弄1號4樓","note":""},{"cat":"分會六長","seq":22,"club":"菁英","title":"會長","name":"林祐頡","phone":"0965-150-912","email":"","addr":"宜蘭縣羅東鎮民生路170巷16-1號","note":""},{"cat":"分會六長","seq":22,"club":"菁英","title":"前任會長","name":"石建明","phone":"0972-286-381","email":"","addr":"宜蘭縣宜蘭市慈安路12巷5號","note":""},{"cat":"分會六長","seq":22,"club":"菁英","title":"秘書長","name":"羅小英","phone":"0965-585-610","email":"","addr":"宜蘭市健康路三段83號宜蘭市健康路三段83號","note":""},{"cat":"分會六長","seq":22,"club":"菁英","title":"財務長","name":"吳克濮","phone":"0972-218-430","email":"","addr":"宜蘭市健康路三段83號","note":""},{"cat":"分會六長","seq":22,"club":"菁英","title":"常務監事","name":"高嘉和","phone":"0933-929-586","email":"","addr":"基隆市仁愛區仁一路133號1樓","note":""},{"cat":"分會六長","seq":23,"club":"薪陽","title":"會長","name":"許家綺","phone":"0920-742-558","email":"g519030405@gmail.com","addr":"新北市樹林區俊英街248巷15-1號","note":""},{"cat":"分會六長","seq":23,"club":"薪陽","title":"前任會長","name":"周毅群","phone":"0912-610-377","email":"lakers20191@yahoo.com.tw","addr":"宜蘭市慈安路10巷2弄19號","note":""},{"cat":"分會六長","seq":23,"club":"薪陽","title":"候任會長","name":"黃育良","phone":"0919-215-370","email":"zx062679@gmail.com","addr":"宜蘭市公園二路26巷28號2樓之一","note":""},{"cat":"分會六長","seq":23,"club":"薪陽","title":"秘書長","name":"賴家慶","phone":"0979-479-581","email":"cinx6783@gmail.co","addr":"宜蘭縣冬山鄉永興路一段70-2號","note":""},{"cat":"分會六長","seq":23,"club":"薪陽","title":"財務長","name":"黃聖惟","phone":"0925-021-023","email":"D89727171@gmail.com","addr":"新北市三重區錦通街20號","note":""},{"cat":"分會六長","seq":23,"club":"薪陽","title":"常務監事","name":"張原彰","phone":"0913-301-607","email":"ginal4502@gmail.com","addr":"宜蘭縣羅東鎮興東南路293號","note":""},{"cat":"分會六長","seq":24,"club":"蘆江","title":"會長","name":"蔡豐棋","phone":"0968-913-131","email":"","addr":"新北市蘆洲區永安北路2段76巷15號","note":""},{"cat":"分會六長","seq":24,"club":"蘆江","title":"前任會長","name":"賴俊成","phone":"0933-127-953","email":"","addr":"新北市蘆洲區長安街249巷40號6樓","note":""},{"cat":"分會六長","seq":24,"club":"蘆江","title":"候任會長","name":"蔡豐棋","phone":"0968-913-131","email":"","addr":"新北市蘆洲區永安北路2段76巷15號","note":""},{"cat":"分會六長","seq":24,"club":"蘆江","title":"秘書長","name":"楊子輝","phone":"0970-903-967","email":"","addr":"新北市蘆洲區永安北路二段76巷13號","note":""},{"cat":"分會六長","seq":24,"club":"蘆江","title":"財務長","name":"王軒隆","phone":"0926-030-099","email":"","addr":"新北市五股區新五路三段310-1號11樓","note":""},{"cat":"分會六長","seq":24,"club":"蘆江","title":"常務監事","name":"賴羅春貴","phone":"0918-877-188","email":"","addr":"新北市蘆洲區長安街246巷25號6樓","note":""},{"cat":"分會六長","seq":25,"club":"八里","title":"會長","name":"林建平","phone":"0953-145-456","email":"lovelin63@hotmail.com","addr":"新北市八里區中山路一段306巷3號8樓","note":""},{"cat":"分會六長","seq":25,"club":"八里","title":"前任會長","name":"林建平","phone":"0953-145-456","email":"lovelin63@hotmail.com","addr":"新北市八里區中山路一段306巷3號8樓","note":""},{"cat":"分會六長","seq":25,"club":"八里","title":"候任會長","name":"陳雅俊","phone":"0919-522-662","email":"","addr":"新北市八里區商港六路53號8樓","note":""},{"cat":"分會六長","seq":25,"club":"八里","title":"秘書長","name":"王進生","phone":"0932-341-920","email":"wang1chn@yahoo.com.tw","addr":"新北市八里區華峰ㄧ街22號8樓","note":""},{"cat":"分會六長","seq":25,"club":"八里","title":"財務長","name":"洪琮驊","phone":"0933-201-698","email":"hungrich588@gmail.com","addr":"新北市八里區中山路二段110-5號1樓","note":""},{"cat":"分會六長","seq":25,"club":"八里","title":"常務監事","name":"廖李成","phone":"0913-602-885","email":"","addr":"新北市五股區自強路42巷5號1樓","note":""},{"cat":"分會六長","seq":26,"club":"新樹","title":"會長","name":"陳添偉","phone":"0919-338-011","email":"","addr":"新北市淡水區桂花樹1-1號","note":""},{"cat":"分會六長","seq":26,"club":"新樹","title":"前任會長","name":"陳添偉","phone":"0919-338-011","email":"","addr":"新北市淡水區桂花樹1-1號","note":""},{"cat":"分會六長","seq":26,"club":"新樹","title":"候任會長","name":"陳定國","phone":"","email":"","addr":"","note":""},{"cat":"分會六長","seq":26,"club":"新樹","title":"秘書長","name":"朱正堯","phone":"02-22104326","email":"","addr":"新北市新店區富貴街23巷17號1樓","note":"電話待確認"},{"cat":"分會六長","seq":26,"club":"新樹","title":"財務長","name":"朱季美","phone":"0919-999-618","email":"","addr":"新北市蘆洲區光明路88巷15號2樓","note":""},{"cat":"分會六長","seq":26,"club":"新樹","title":"常務監事","name":"楊金禮","phone":"0930-157-527","email":"","addr":"新北市新店區黎明路63巷2號3樓","note":""},{"cat":"分會六長","seq":27,"club":"民安","title":"會長","name":"林家興","phone":"","email":"","addr":"","note":""},{"cat":"分會六長","seq":27,"club":"民安","title":"前任會長","name":"田朝清","phone":"","email":"","addr":"","note":""},{"cat":"分會六長","seq":27,"club":"民安","title":"秘書長","name":"吳振成","phone":"","email":"","addr":"","note":""},{"cat":"分會六長","seq":27,"club":"民安","title":"財務長","name":"鄭佳境","phone":"","email":"","addr":"","note":""},{"cat":"分會六長","seq":28,"club":"孝行","title":"會長","name":"潘圓糖","phone":"0931-545-143","email":"jordon920129@gmail.com","addr":"新北市蘆洲區中正路185巷23弄31號2樓","note":""},{"cat":"分會六長","seq":28,"club":"孝行","title":"前任會長","name":"潘圓糖","phone":"0931-545-143","email":"jordon920129@gmail.com","addr":"新北市蘆洲區中正路185巷23弄31號2樓","note":""},{"cat":"分會六長","seq":28,"club":"孝行","title":"候任會長","name":"吳孟璋","phone":"0968-951-878","email":"","addr":"桃園市平鎮區崇義六街2號2樓","note":""},{"cat":"分會六長","seq":28,"club":"孝行","title":"秘書長","name":"高麗惠","phone":"0921-122-098","email":"kai0903401535@gmail.com","addr":"台北市中正區晉江街124巷8弄14號","note":""},{"cat":"分會六長","seq":28,"club":"孝行","title":"財務長","name":"許心綝","phone":"0921-841-852","email":"hsf4113@gmail.com","addr":"台北市大安區泰順街16巷26號2樓","note":""},{"cat":"分會六長","seq":28,"club":"孝行","title":"常務監事","name":"林進仁","phone":"0909-386-666","email":"","addr":"新北市新莊區中正路657-5號1樓","note":""},{"cat":"分會六長","seq":29,"club":"大嬸婆","title":"會長","name":"蕭檉譁","phone":"0926-196-505","email":"shaiu407@gmail.com","addr":"新北市三峽區隆恩街239號","note":""},{"cat":"分會六長","seq":29,"club":"大嬸婆","title":"前任會長","name":"林俊宏","phone":"0933-251-514","email":"ch.lin0811@gmail.com","addr":"桃園市桃園區新埔七街156號3樓","note":""},{"cat":"分會六長","seq":29,"club":"大嬸婆","title":"候任會長","name":"陳耀堂","phone":"0906-060-025","email":"","addr":"新北市汐止區樟樹一路120巷","note":""},{"cat":"分會六長","seq":29,"club":"大嬸婆","title":"秘書長","name":"彭思溫","phone":"0935-194-409","email":"c93075@gmail.com","addr":"新北市中和區景德街28號21樓","note":""},{"cat":"分會六長","seq":29,"club":"大嬸婆","title":"財務長","name":"蕭幸琪","phone":"0966-494-838","email":"a0966494838@gmail.com","addr":"新北市三峽區中山路220巷5號3樓","note":""},{"cat":"分會六長","seq":29,"club":"大嬸婆","title":"常務監事","name":"蕭韻華","phone":"0907-522-009","email":"","addr":"桃園市大園區華興路157號","note":""},{"cat":"分會六長","seq":30,"club":"大道","title":"會長","name":"鍾青錦","phone":"","email":"porce15258@gmail.com","addr":"北市北投區竹子湖路33-13號","note":""},{"cat":"分會六長","seq":30,"club":"大道","title":"前任會長","name":"陳金蘭","phone":"0981-139-856","email":"","addr":"新北市樹林區千歲街86號","note":""},{"cat":"分會六長","seq":30,"club":"大道","title":"候任會長","name":"鄧師文","phone":"0939-383-259","email":"swendeng@gmail.com","addr":"新北市林口區民權路12巷9號2樓","note":""},{"cat":"分會六長","seq":30,"club":"大道","title":"秘書長","name":"鄧師文","phone":"0939-383-260","email":"swendeng@gmail.com","addr":"新北市林口區民權路12巷9號3樓","note":""},{"cat":"分會六長","seq":30,"club":"大道","title":"財務長","name":"鄭惠年","phone":"0970-605-905","email":"H200ancy25168@gmail.com","addr":"北市民生東路五段175號2樓之8","note":""},{"cat":"分會六長","seq":30,"club":"大道","title":"常務監事","name":"張國瑋","phone":"0939-532-195","email":"jkwtiu_512@hotmail.com","addr":"新北市林口區富貴路83號13樓","note":""},{"cat":"分會六長","seq":31,"club":"成美","title":"會長","name":"劉珈君","phone":"0931-190-268","email":"violmy@me.com","addr":"台北市大安區忠孝東路四段289號5樓之四","note":""},{"cat":"分會六長","seq":31,"club":"成美","title":"前任會長","name":"謝賀丞","phone":"0966-693-135","email":"hans693135@gmail.com","addr":"宜蘭縣宜蘭市自強新路66號","note":""},{"cat":"分會六長","seq":31,"club":"成美","title":"候任會長","name":"馮棋源","phone":"0928-230-068","email":"chillyfengshopcom@gmail.com","addr":"台北市北投區大同街230號5樓之2","note":""},{"cat":"分會六長","seq":31,"club":"成美","title":"秘書長","name":"陳依琳","phone":"0933-152-622","email":"Elin.chen92@gmail.com","addr":"宜蘭縣冬山鄉義成路三段36巷1弄1號","note":""},{"cat":"分會六長","seq":31,"club":"成美","title":"財務長","name":"吳若琪","phone":"0937-952-352","email":"kiki710412@hotmail.com","addr":"新北市中和區和城路一段511號3樓","note":""},{"cat":"分會六長","seq":31,"club":"成美","title":"常務監事","name":"鍾自強","phone":"0916-150-282","email":"Elitechung1220@gmail.com","addr":"新北市永和區中正路391巷1號6樓之四","note":""},{"cat":"分會六長","seq":32,"club":"天使","title":"會長","name":"張雅蓁","phone":"0906-572-678","email":"yourpari@gmail.com","addr":"台北市士林區承德路四段235號10樓","note":""},{"cat":"分會六長","seq":32,"club":"天使","title":"前任會長","name":"林宥成","phone":"0930-380-919","email":"a70631a@yahoo.com.tw","addr":"北市北投區立農街一段22巷2弄4號2樓","note":""},{"cat":"分會六長","seq":32,"club":"天使","title":"候任會長","name":"劉波","phone":"0916-037-575","email":"","addr":"桃園市蘆竹區宏竹路101巷127-1號","note":""},{"cat":"分會六長","seq":32,"club":"天使","title":"秘書長","name":"吳緁羚","phone":"0985-231-436","email":"open790612@gmail.com","addr":"桃園市蘆竹區新興街379巷23弄10號","note":""},{"cat":"分會六長","seq":32,"club":"天使","title":"財務長","name":"盧緒瀅","phone":"0916-803-583","email":"","addr":"新北市三重區雙園街138號","note":""},{"cat":"分會六長","seq":32,"club":"天使","title":"常務監事","name":"蔡于正","phone":"0933-004-057","email":"charles@zycintl.com","addr":"台北市士林區承德路四段235號10樓","note":""},{"cat":"分會六長","seq":33,"club":"同興","title":"會長","name":"顏怡萍","phone":"0910-499-276","email":"yip104@gmail.com","addr":"新北市樹林區學勤路388號22樓","note":""},{"cat":"分會六長","seq":33,"club":"同興","title":"前任會長","name":"駱文豪","phone":"0989-999-252","email":"XTurn.com@gmail.com","addr":"台北市大同區民權西路144巷9號","note":""},{"cat":"分會六長","seq":33,"club":"同興","title":"候任會長","name":"簡吟潔","phone":"0989-999-053","email":"XTurn.com@gmail.com","addr":"台北市大同區民權西路144巷9號","note":""},{"cat":"分會六長","seq":33,"club":"同興","title":"秘書長","name":"蔡培根","phone":"0960-356-789","email":"0929tsai@gmail.com","addr":"台北市大安區四維路198巷20弄4號16樓","note":""},{"cat":"分會六長","seq":33,"club":"同興","title":"財務長","name":"郭志鑫","phone":"0909-908-370","email":"max621026@gmail.com","addr":"桃園市中壢區內定12街58巷1號","note":""},{"cat":"分會六長","seq":33,"club":"同興","title":"常務監事","name":"呂天龍","phone":"0966-637-220","email":"longer888168@gmail.com","addr":"新北市新莊區中正路891之43號5樓之五","note":""},{"cat":"分會六長","seq":34,"club":"蘭陽","title":"會長","name":"呂家逸","phone":"0963-093-049","email":"frank0963093049@gmail.com","addr":"台北市信義區松仁路155號6樓","note":""},{"cat":"分會六長","seq":34,"club":"蘭陽","title":"前任會長","name":"林俊榮","phone":"0980-114-996","email":"youing51@gmail.com","addr":"宜蘭縣五結鄉中正三路507號2樓","note":""},{"cat":"分會六長","seq":34,"club":"蘭陽","title":"秘書長","name":"江秋慧","phone":"0989-373-179","email":"cathy14962@gmail.com","addr":"宜蘭縣羅東鎮復興路二段123巷7弄41號","note":""},{"cat":"分會六長","seq":34,"club":"蘭陽","title":"財務長","name":"吳明彰","phone":"0961-296-679","email":"egenmjwu@gmail.com","addr":"宜蘭縣三星鄉集義路57巷7號","note":""},{"cat":"分會六長","seq":34,"club":"蘭陽","title":"常務監事","name":"廖添茂","phone":"0975-227-162","email":"p5413p5413@gmail.com","addr":"新北市五股區自強路92號","note":""},{"cat":"分會六長","seq":35,"club":"鉦新","title":"會長","name":"余翊瑄","phone":"0933-233-668","email":"","addr":"新北市泰山壽山路160巷2弄15號3樓","note":""},{"cat":"分會六長","seq":35,"club":"鉦新","title":"前任會長","name":"周紜龍","phone":"0932-295-522","email":"","addr":"新北市新莊區萬安街6號7樓","note":""},{"cat":"分會六長","seq":35,"club":"鉦新","title":"秘書長","name":"李柔慧","phone":"0910-440-932","email":"","addr":"新莊區新樹路11號","note":""},{"cat":"分會六長","seq":35,"club":"鉦新","title":"財務長","name":"陳金蘭","phone":"0981-139-856","email":"","addr":"新北市樹林區千歲街86號","note":""},{"cat":"分會六長","seq":35,"club":"鉦新","title":"常務監事","name":"林孟鴻","phone":"0917-506-868","email":"","addr":"新北市新莊區建豐街43號","note":""},{"cat":"分會六長","seq":36,"club":"泰雅","title":"會長","name":"林甄琪","phone":"0975-584-135","email":"","addr":"宜蘭縣羅東鎮中華路70號","note":""},{"cat":"分會六長","seq":36,"club":"泰雅","title":"前任會長","name":"林甄琪","phone":"0975-584-135","email":"","addr":"宜蘭縣羅東鎮中華路70號","note":""},{"cat":"分會六長","seq":36,"club":"泰雅","title":"秘書長","name":"陳達玲","phone":"0988-268-528","email":"","addr":"宜蘭縣大同鄉寒溪村寒溪巷55-10號","note":""},{"cat":"分會六長","seq":36,"club":"泰雅","title":"財務長","name":"嚴宜堂","phone":"0912-530-520","email":"yyt262@yahoo.com.tw","addr":"宜蘭縣羅東鎮樹人路1巷20弄10號","note":""},{"cat":"分會六長","seq":36,"club":"泰雅","title":"常務監事","name":"林李美花","phone":"0989-614-280","email":"","addr":"宜蘭縣羅東鎮站前南路159巷1-1號","note":""},{"cat":"分會六長","seq":37,"club":"噶瑪蘭","title":"會長","name":"陳麗芬","phone":"0932-907-475","email":"a0975676158@gmail.com","addr":"宜蘭縣宜蘭市凱旋里鎮安路122號","note":""},{"cat":"分會六長","seq":37,"club":"噶瑪蘭","title":"前任會長","name":"許福長","phone":"0935-915-458","email":"o8888@ms11.hinet.net","addr":"新北市樹林區俊英街248巷15之一號","note":""},{"cat":"分會六長","seq":37,"club":"噶瑪蘭","title":"候任會長","name":"駱淑敏","phone":"0919-216-224","email":"loxiaomin@gmail.com","addr":"宜蘭縣蘇澳鎮隘丁里忠孝路221號","note":""},{"cat":"分會六長","seq":37,"club":"噶瑪蘭","title":"秘書長","name":"駱淑敏","phone":"0919-216-224","email":"loxiaomin@gmail.com","addr":"宜蘭縣蘇澳鎮隘丁里忠孝路221號","note":""},{"cat":"分會六長","seq":37,"club":"噶瑪蘭","title":"財務長","name":"黃金雪","phone":"0922-669-886","email":"Pceskid05@gmail.com","addr":"宜蘭縣羅東鎮豐年路39巷23號","note":""},{"cat":"分會六長","seq":37,"club":"噶瑪蘭","title":"常務監事","name":"高得勝","phone":"0938-173-986","email":"u09081003@yahoo.com.tw","addr":"宜蘭縣宜蘭市中山路五段458號","note":""},{"cat":"分會六長","seq":38,"club":"永民","title":"會長","name":"陳慧陵","phone":"","email":"","addr":"","note":""}];
+
+let M=[],C=[],META={},view="menu",tab="fee",filt="all",dtab="區職人員",unlocked=false,pending=null;
+const WORD={fee:{todo:"未繳",done:"已繳",list:"尚未繳交會費"},
+            tie:{todo:"未領",done:"已領",list:"尚未領取領帶"},
+            award:{todo:"未領",done:"已領",list:"尚未領取敘獎禮品"}};
+const $=id=>document.getElementById(id);
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800);}
+function roc(d){const x=new Date(d);return (x.getFullYear()-1911)+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"
+  +String(x.getDate()).padStart(2,"0")+" "+String(x.getHours()).padStart(2,"0")+":"+String(x.getMinutes()).padStart(2,"0");}
+
+/* ---------- 載入 ---------- */
+async function boot(){
+  try{
+    let {data,error}=await db.from(T_M).select("*").order("sort_no");
+    if(error)throw error;
+    if(!data||!data.length){
+      const rows=SEED_M.map((r,i)=>({sort_no:i+1,grp:r[0],title:r[1],name:r[2],
+        fee_amount:0,fee_paid:false,tie_received:!!r[3],award_received:!!r[4]}));
+      await db.from(T_M).insert(rows);
+      data=(await db.from(T_M).select("*").order("sort_no")).data;
+    }
+    M=data;
+    let c=await db.from(T_C).select("*").order("id");
+    if(!c.data||!c.data.length){
+      await db.from(T_C).insert(SEED_C);
+      c=await db.from(T_C).select("*").order("id");
+      await setMeta("contacts_updated",new Date().toISOString());
+      await setMeta("contacts_count",String(SEED_C.length));
+      await setMeta("contacts_file","北一區通訊錄_維護用.xlsx（初始匯入）");
+    }
+    C=c.data||[];
+    const mt=await db.from(T_X).select("*");
+    (mt.data||[]).forEach(r=>META[r.k]=r.v);
+    db.channel("kiwanis").on("postgres_changes",{event:"*",schema:"public",table:T_M},p=>{
+      const r=p.new;if(!r)return;const i=M.findIndex(x=>x.id===r.id);
+      if(i>=0)M[i]=r;else M.push(r);M.sort((a,b)=>a.sort_no-b.sort_no);if(view==="club")render();
+    }).subscribe();
+    $("menu").style.display="block";
+  }catch(e){
+    $("gerr").textContent="連線失敗："+(e.message||e);
+    $("gate").style.display="grid";
   }
-  $("list").innerHTML = html;
+}
+async function setMeta(k,v){
+  META[k]=v;
+  await db.from(T_X).upsert({k,v,updated_at:new Date().toISOString()},{onConflict:"k"});
 }
 
-$("list").onclick = e => {
-  const b = e.target.closest("button");
-  if (!b) return;
-  if (b.dataset.view) showReceipt(b.dataset.view);
-  if (b.dataset.toggle) togglePaid(b.dataset.toggle);
-  if (b.dataset.edit) openSheet(rows.find(r => r.id === b.dataset.edit));
-};
-$("q").oninput = render;
-$("month").onchange = render;
-for (const [id, val] of [["cAll","all"],["cUnpaid","unpaid"],["cRecp","receipt"]]) {
-  $(id).onclick = () => {
-    filter = val;
-    for (const x of ["cAll","cUnpaid","cRecp"]) $(x).setAttribute("aria-pressed", "false");
-    $(id).setAttribute("aria-pressed", "true");
-    render();
-  };
+/* ---------- 畫面切換 ---------- */
+function go(v){
+  view=v;
+  $("menu").style.display=v==="menu"?"block":"none";
+  $("app").style.display=v==="menu"?"none":"block";
+  $("hd").style.display=v==="menu"?"none":"block";
+  $("backBtn").style.display=v==="menu"?"none":"block";
+  $("clubView").style.display=v==="club"?"block":"none";
+  $("dirView").style.display=v==="dir"?"block":"none";
+  $("clubTabs").style.display=v==="club"?"flex":"none";
+  $("dirTabs").style.display=v==="dir"?"flex":"none";
+  $("hTitle").textContent=v==="dir"?"北一區通訊錄":"淡水國際同濟會　第28屆";
+  $("hSub").textContent=v==="dir"?"第53屆　2026–2027":"2026–2027年　會務追蹤表";
+  if(v==="club")render(); if(v==="dir")renderDir();
+}
+document.querySelectorAll(".mcard").forEach(b=>b.onclick=()=>go(b.dataset.go));
+$("backBtn").onclick=()=>go("menu");
+
+/* ---------- 會務資訊 ---------- */
+async function push(row,patch){
+  Object.assign(row,patch);render();
+  const {error}=await db.from(T_M).update(Object.assign({},patch,{updated_at:new Date().toISOString()})).eq("id",row.id);
+  if(error)toast("儲存失敗，請重試");
+}
+function done(m){return tab==="fee"?m.fee_paid:(tab==="tie"?m.tie_received:m.award_received);}
+function toggle(m){const k=tab==="fee"?"fee_paid":(tab==="tie"?"tie_received":"award_received");push(m,{[k]:!m[k]});}
+const timers={};
+function setAmt(m,v){m.fee_amount=v===""?0:+v;stats();clearTimeout(timers[m.id]);
+  timers[m.id]=setTimeout(()=>push(m,{fee_amount:m.fee_amount}),500);}
+
+function render(){
+  const q=$("q").value.trim(),w=WORD[tab];
+  $("chipTodo").textContent=w.todo;$("chipDone").textContent=w.done;
+  $("copyBtn").textContent=filt==="done"?"複製已完成":"複製未完成";
+  const isFee=tab==="fee";
+  $("feeTools").style.display=(isFee&&unlocked)?"flex":"none";
+  const list=$("list");list.innerHTML="";let shown=0;
+  ["幹部","歷屆會長","會兄"].forEach(g=>{
+    const all=M.filter(m=>m.grp===g);
+    const rows=all.filter(m=>(!q||(m.name||"").includes(q)||(m.title||"").includes(q))
+      &&(filt==="all"||(filt==="todo"?!done(m):done(m))));
+    if(!rows.length)return;shown+=rows.length;
+    const h=document.createElement("h2");h.className="grp";
+    h.innerHTML=g+' <em>'+(filt==="all"?all.filter(done).length+' / '+all.length:rows.length+' 人')+'</em>';
+    list.appendChild(h);
+    rows.forEach(m=>{
+      const d=done(m),el=document.createElement("div");el.className="item"+(d?" done":"");
+      el.innerHTML='<div class="who"><div class="name">'+m.name+'</div><div class="title">'+m.title+'</div></div>';
+      if(isFee){
+        if(unlocked){const inp=document.createElement("input");inp.type="number";inp.className="money";
+          inp.placeholder="金額";inp.step="100";inp.value=m.fee_amount||"";inp.oninput=()=>setAmt(m,inp.value);el.appendChild(inp);}
+        else{const sp=document.createElement("div");sp.className="moneyRO";
+          sp.textContent=m.fee_amount?"$"+(+m.fee_amount).toLocaleString():"";el.appendChild(sp);}
+      }
+      const b=document.createElement("button");b.className="chk"+(d?" on":"");b.textContent="✓";
+      if(unlocked)b.onclick=()=>toggle(m);
+      else{b.classList.add("ro");b.onclick=()=>toast("需輸入編輯密碼才能修改");}
+      el.appendChild(b);list.appendChild(el);
+    });
+  });
+  if(!shown){const e=document.createElement("div");e.className="empty";
+    e.textContent=q?"找不到「"+q+"」":(filt==="todo"?"全部都完成了 🎉":"目前還沒有人完成");list.appendChild(e);}
+  stats();
+}
+function stats(){
+  const N=M.length||1;
+  const t1=M.filter(m=>m.fee_paid).length,t2=M.filter(m=>m.tie_received).length,t3=M.filter(m=>m.award_received).length;
+  $("tb1").textContent=t1+"/"+M.length;$("tb2").textContent=t2+"/"+M.length;$("tb3").textContent=t3+"/"+M.length;
+  let n,lab;
+  if(tab==="fee"){n=t1;
+    if(unlocked){const due=M.reduce((s,m)=>s+(+m.fee_amount||0),0),got=M.reduce((s,m)=>s+(m.fee_paid?(+m.fee_amount||0):0),0);
+      lab="應收 $"+due.toLocaleString()+"　已收 $"+got.toLocaleString()+"　未收 $"+(due-got).toLocaleString();}
+    else lab="已繳會費人數";
+  }else if(tab==="tie"){n=t2;lab="已領取領帶";}else{n=t3;lab="已領取敘獎禮品";}
+  $("statLab").textContent=lab;$("statBig").textContent=n+" / "+M.length+" 人";
+  $("fill").style.width=(n/N*100)+"%";
 }
 
-/* ---------- 打勾 ---------- */
-async function togglePaid(id) {
-  const r = rows.find(x => x.id === id);
-  const now = !r.claimed;
-  r.claimed = now; r.claimed_at = now ? new Date().toISOString() : null;
-  render();
-  const { error } = await sb.from("expenses")
-    .update({ claimed: now, claimed_at: r.claimed_at }).eq("id", id);
-  if (error) { toast("存不起來：" + error.message); load(); }
-  else toast(now ? "標記為已請款" : "改回未請款");
-}
+/* ---------- 通訊錄 ---------- */
+function renderDir(){
+  const q=$("dq").value.trim(),showAddr=$("showAddr").checked;
+  const named=C.filter(c=>c.name);
+  $("db1").textContent=named.filter(c=>c.cat==="區職人員").length+" 人";
+  $("db2").textContent=named.filter(c=>c.cat==="分會六長").length+" 人";
+  const upd=META.contacts_updated?roc(META.contacts_updated):"—";
+  $("dirSub").textContent="資料更新於 "+upd+"・共 "+named.length+" 人";
+  $("verBox").innerHTML="目前線上版本<b>"+upd+"</b>"+named.length+" 人・"+(META.contacts_file||"—");
+  $("upBox").style.display=unlocked?"block":"none";
 
-/* ---------- 收據 ---------- */
-async function showReceipt(path) {
-  toast("開啟收據…");
-  const { data, error } = await sb.storage.from("receipts").createSignedUrl(path, 120);
-  if (error) return toast("讀不到收據：" + error.message);
-  $("vImg").src = data.signedUrl;
-  $("viewer").classList.add("on");
-}
-$("vClose").onclick = () => $("viewer").classList.remove("on");
-$("viewer").onclick = e => { if (e.target.id === "viewer") $("viewer").classList.remove("on"); };
-
-function shrink(file) {
-  return new Promise((res, rej) => {
-    const img = new Image();
-    img.onload = () => {
-      const max = 1400;
-      const s = Math.min(1, max / Math.max(img.width, img.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      c.toBlob(b => b ? res(b) : rej(new Error("圖片轉檔失敗")), "image/jpeg", 0.82);
-      URL.revokeObjectURL(img.src);
-    };
-    img.onerror = () => rej(new Error("這個檔案不是圖片"));
-    img.src = URL.createObjectURL(file);
+  const rows=named.filter(c=>c.cat===dtab&&(!q||[c.name,c.club,c.title].join("").includes(q)));
+  const box=$("dlist");box.innerHTML="";
+  if(!rows.length){box.innerHTML='<div class="empty">'+(q?"找不到「"+q+"」":"沒有資料")+'</div>';return;}
+  const groups=dtab==="分會六長"?[...new Set(rows.map(c=>c.club))]:[""];
+  groups.forEach(g=>{
+    const sub=dtab==="分會六長"?rows.filter(c=>c.club===g):rows;
+    if(g){const h=document.createElement("h2");h.className="grp";
+      h.innerHTML=g+'會 <em>'+sub.length+' 人</em>';box.appendChild(h);}
+    sub.forEach(c=>{
+      const el=document.createElement("div");el.className="pc";
+      let s='<div class="l1"><span class="nm">'+c.name+'</span>';
+      if(c.club)s+='<span class="cb">'+c.club+'</span>';
+      s+='<span class="tt">'+(c.title||"")+'</span></div>';
+      s+=c.phone?'<a href="tel:'+c.phone.replace(/[^0-9+]/g,"")+'">📞 '+c.phone+'</a>':'<span class="na">📞 未提供</span>';
+      s+=c.email?'<a href="mailto:'+c.email+'">✉️ '+c.email+'</a>':'<span class="na">✉️ 未提供</span>';
+      if(showAddr&&c.addr)s+='<div class="ad">📍 '+c.addr+'</div>';
+      if(c.note)s+='<div class="ad" style="color:#A8622F">⚠ '+c.note+'</div>';
+      el.innerHTML=s;box.appendChild(el);
+    });
   });
 }
+document.querySelectorAll("[data-dtab]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-dtab]").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");dtab=b.dataset.dtab;renderDir();
+});
+$("dq").oninput=renderDir;
+$("showAddr").onchange=renderDir;
 
-/* ---------- 表單 ---------- */
-function openSheet(r) {
-  editing = r || null;
-  pendingFile = null; removeReceipt = false;
-  $("sheetTitle").textContent = r ? "編輯這筆" : "記一筆";
-  $("f_date").value = r ? r.spend_date : new Date().toLocaleDateString("sv-SE");
-  $("f_item").value = r ? r.item : "";
-  $("f_amount").value = r ? r.amount : "";
-  $("f_note").value = r ? (r.note || "") : "";
-  $("f_claimed").checked = r ? r.claimed : false;
-  $("del").style.display = r ? "block" : "none";
-  $("prev").style.display = "none"; $("prevImg").src = "";
-  $("drop").textContent = r && r.receipt_path ? "🧾 已有收據，點這裡換一張" : "📷 點這裡拍照或選圖片";
-  $("save").disabled = false; $("save").textContent = "儲存";
-  $("sheet").classList.add("on");
-}
-$("fab").onclick = () => openSheet(null);
-for (const el of document.querySelectorAll("[data-close]")) el.onclick = () => $("sheet").classList.remove("on");
-
-$("drop").onclick = () => $("f_file").click();
-$("f_file").onchange = async e => {
-  const f = e.target.files[0]; if (!f) return;
-  try {
-    pendingFile = await shrink(f);
-    removeReceipt = false;
-    $("prevImg").src = URL.createObjectURL(pendingFile);
-    $("prev").style.display = "block";
-    $("drop").textContent = "📷 換一張";
-  } catch (err) { toast(err.message); }
-  e.target.value = "";
-};
-$("rmImg").onclick = () => {
-  pendingFile = null; removeReceipt = true;
-  $("prev").style.display = "none";
-  $("drop").textContent = "📷 點這裡拍照或選圖片";
-};
-
-$("save").onclick = async () => {
-  const date = $("f_date").value;
-  const item = $("f_item").value.trim();
-  const amt = Number($("f_amount").value);
-  if (!date) return toast("先選日期");
-  if (!item) return toast("內容要填一下");
-  if (!amt) return toast("金額要填一下");
-
-  $("save").disabled = true; $("save").textContent = "儲存中…";
-  const claimed = $("f_claimed").checked;
-  const rec = {
-    spend_date: date, item, amount: amt,
-    note: $("f_note").value.trim() || null,
-    claimed, claimed_at: claimed ? (editing?.claimed_at || new Date().toISOString()) : null
+/* 讀 Excel */
+$("xlsFile").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:"array"});
+      const ws=wb.Sheets["通訊錄"]||wb.Sheets[wb.SheetNames[0]];
+      const aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+      let hi=aoa.findIndex(r=>r.includes("姓名")&&r.includes("職稱"));
+      if(hi<0)throw new Error("找不到欄位名稱列（需含『職稱』『姓名』）");
+      const H=aoa[hi].map(x=>String(x).trim());
+      const ix=n=>H.indexOf(n);
+      const out=[];
+      for(let i=hi+1;i<aoa.length;i++){
+        const r=aoa[i];if(!r||!String(r[ix("姓名")]||"").trim())continue;
+        out.push({cat:String(r[ix("類別")]||"").trim(),seq:+r[ix("序")]||0,
+          club:String(r[ix("會別")]||"").trim(),title:String(r[ix("職稱")]||"").trim(),
+          name:String(r[ix("姓名")]||"").trim(),phone:String(r[ix("行動電話")]||"").trim(),
+          email:String(r[ix("Email")]||"").trim(),addr:String(r[ix("地址")]||"").trim(),
+          note:String(r[ix("備註")]||"").trim()});
+      }
+      if(!out.length)throw new Error("沒有讀到任何有姓名的資料");
+      pending={rows:out,file:f.name};
+      const a=out.filter(x=>x.cat==="區職人員").length,b=out.length-a,noP=out.filter(x=>!x.phone).length;
+      $("dirNote").style.display="block";
+      $("dirNote").textContent="讀取結果：區職人員 "+a+" 人、分會六長 "+b+" 人"+(noP?"，其中 "+noP+" 人缺電話（仍會匯入）":"")+"。按「確認更新」寫入。";
+      $("upBtn").disabled=false;
+    }catch(err){pending=null;$("upBtn").disabled=true;
+      $("dirNote").style.display="block";$("dirNote").textContent="讀取失敗："+err.message;}
   };
-
-  try {
-    let oldPath = editing?.receipt_path || null;
-    if (pendingFile) {
-      const p = `${crypto.randomUUID()}.jpg`;
-      const { error } = await sb.storage.from("receipts")
-        .upload(p, pendingFile, { contentType: "image/jpeg" });
-      if (error) throw error;
-      rec.receipt_path = p;
-    } else if (removeReceipt) {
-      rec.receipt_path = null;
+  rd.readAsArrayBuffer(f);
+};
+$("upBtn").onclick=async()=>{
+  if(!pending)return;
+  if(!confirm("將以這份檔案覆蓋線上名冊（"+pending.rows.length+" 人），確定嗎？"))return;
+  $("upBtn").disabled=true;$("upBtn").textContent="更新中…";
+  try{
+    const before=C.filter(c=>c.name).map(c=>c.name+"|"+c.phone);
+    await db.from(T_C).delete().neq("id",0);
+    for(let i=0;i<pending.rows.length;i+=200){
+      const {error}=await db.from(T_C).insert(pending.rows.slice(i,i+200));
+      if(error)throw error;
     }
-
-    if (editing) {
-      const { error } = await sb.from("expenses").update(rec).eq("id", editing.id);
-      if (error) throw error;
-      if (oldPath && rec.receipt_path !== undefined && rec.receipt_path !== oldPath)
-        await sb.storage.from("receipts").remove([oldPath]);
-    } else {
-      const { error } = await sb.from("expenses").insert(rec);
-      if (error) throw error;
-    }
-    $("sheet").classList.remove("on");
-    toast(editing ? "改好了" : "記好了");
-    await load();
-  } catch (err) {
-    toast("存不進去：" + (err.message || err));
-  } finally {
-    $("save").disabled = false; $("save").textContent = "儲存";
-  }
+    C=(await db.from(T_C).select("*").order("id")).data||[];
+    const now=new Date().toISOString();
+    await setMeta("contacts_updated",now);
+    await setMeta("contacts_count",String(pending.rows.length));
+    await setMeta("contacts_file",pending.file);
+    const after=C.filter(c=>c.name).map(c=>c.name+"|"+c.phone);
+    const add=after.filter(x=>!before.includes(x)).length,del=before.filter(x=>!after.includes(x)).length;
+    $("dirNote").textContent="✅ 通訊錄已更新　"+roc(now)+"・"+after.length+" 人・新增或異動 "+add+" 筆、移除 "+del+" 筆";
+    pending=null;$("xlsFile").value="";renderDir();toast("更新完成");
+  }catch(e){$("dirNote").textContent="更新失敗："+(e.message||e);toast("更新失敗");}
+  $("upBtn").textContent="確認更新";
+};
+$("dlBtn").onclick=()=>{
+  const now=new Date(),stamp=roc(now);
+  const head=["類別","序","會別","職稱","姓名","行動電話","Email","地址","備註"];
+  const aoa=[["第53屆 2026-2027 北一區區職人員名冊・分會六長通訊錄"],
+    ["※ 第3列為欄位名稱，此列請勿更動。　│　此檔版本："+stamp+" 由網頁下載"],head];
+  C.forEach(c=>aoa.push([c.cat,c.seq||"",c.club,c.title,c.name,c.phone,c.email,c.addr,c.note]));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),"通訊錄");
+  const d=(now.getFullYear()-1911)+String(now.getMonth()+1).padStart(2,"0")+String(now.getDate()).padStart(2,"0");
+  XLSX.writeFile(wb,"北一區通訊錄_"+d+".xlsx");
 };
 
-$("del").onclick = async () => {
-  if (!editing || !confirm(`確定刪除「${editing.item}」？刪掉就找不回來了`)) return;
-  const { error } = await sb.from("expenses").delete().eq("id", editing.id);
-  if (error) return toast("刪不掉：" + error.message);
-  if (editing.receipt_path) await sb.storage.from("receipts").remove([editing.receipt_path]);
-  $("sheet").classList.remove("on");
-  toast("已刪除");
-  load();
-};
-
-let tid;
-function toast(msg) {
-  $("toast").textContent = msg;
-  $("toast").classList.add("on");
-  clearTimeout(tid);
-  tid = setTimeout(() => $("toast").classList.remove("on"), 2200);
+/* ---------- 共用 ---------- */
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-tab]").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");tab=b.dataset.tab;render();
+});
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");filt=b.dataset.f;render();
+});
+$("q").oninput=render;
+async function tryUnlock(){
+  const el=$("pw");if(!el.value)return;
+  try{await openVault(el.value,VB);unlocked=true;el.value="";refreshLock();
+    view==="dir"?renderDir():render();toast("已進入編輯模式");}
+  catch(e){el.value="";toast("密碼錯誤");}
 }
+function refreshLock(){
+  $("lockTxt").textContent=unlocked?"編輯模式・可打勾與改金額":"檢視模式・輸入密碼可編輯";
+  $("pw").style.display=unlocked?"none":"block";
+  $("unlockBtn").style.display=unlocked?"none":"block";
+  $("lockBtn").style.display=unlocked?"block":"none";
+}
+$("unlockBtn").onclick=tryUnlock;
+$("pw").onkeydown=e=>{if(e.key==="Enter")tryUnlock();};
+$("lockBtn").onclick=()=>{unlocked=false;refreshLock();view==="dir"?renderDir():render();toast("已回到檢視模式");};
+$("applyAll").onclick=async()=>{
+  const v=+$("defAmt").value||0;M.forEach(m=>m.fee_amount=v);render();
+  const {error}=await db.from(T_M).update({fee_amount:v}).neq("id",0);
+  toast(error?"儲存失敗":"已套用 $"+v+" 到全部");
+};
+$("applyEmpty").onclick=async()=>{
+  const v=+$("defAmt").value||0;const ids=M.filter(m=>!m.fee_amount).map(m=>m.id);
+  if(!ids.length){toast("沒有空白的欄位");return;}
+  M.forEach(m=>{if(ids.includes(m.id))m.fee_amount=v;});render();
+  const {error}=await db.from(T_M).update({fee_amount:v}).in("id",ids);
+  toast(error?"儲存失敗":"空白欄位已填入 $"+v);
+};
+$("copyBtn").onclick=()=>{
+  const w=WORD[tab],wd=filt==="done";
+  const rows=M.filter(m=>wd?done(m):!done(m)).map(m=>"・"+m.name+"（"+m.title+"）");
+  const head=wd?"【已完成："+w.list.replace("尚未","")+"】":"【"+w.list+"】";
+  navigator.clipboard.writeText(head+"共 "+rows.length+" 人\n"+rows.join("\n"))
+    .then(()=>toast("已複製 "+rows.length+" 人"),()=>toast("複製失敗，請長按選取"));
+};
+$("csvBtn").onclick=()=>{
+  let c="\uFEFF職稱,姓名,"+(unlocked?"會費金額,":"")+"會費已繳,領帶已領,敘獎已領\n";
+  M.forEach(m=>{const a=[m.title,m.name];if(unlocked)a.push(m.fee_amount||0);
+    a.push(m.fee_paid?"V":"",m.tie_received?"V":"",m.award_received?"V":"");c+=a.join(",")+"\n";});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));
+  a.download="同濟會第28屆_會務追蹤.csv";a.click();toast("已匯出 CSV");
+};
+async function signIn(){
+  const el=$("gpw"),err=$("gerr"),btn=$("goBtn");
+  if(!el.value){err.textContent="請輸入密碼";return;}
+  btn.disabled=true;btn.textContent="開啟中…";err.textContent="";
+  try{
+    const key=await openVault(el.value,VA);
+    db=supabase.createClient(SB_URL,key);
+    $("gate").style.display="none";
+    refreshLock();
+    await boot();
+  }catch(e){err.textContent="密碼錯誤";el.value="";}
+  btn.disabled=false;btn.textContent="開啟";
+}
+$("goBtn").onclick=signIn;
+$("gpw").onkeydown=e=>{if(e.key==="Enter")signIn();};
+$("gpw").focus();
 </script>
 </body>
 </html>
